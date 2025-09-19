@@ -11,6 +11,7 @@ import {
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebaseConfig";
 import styles from "../src/styles/styles";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -20,6 +21,7 @@ export default function Index() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [idToken, setIdToken] = useState("");
 
   useEffect(() => {
     async function prepare() {
@@ -42,13 +44,19 @@ export default function Index() {
   }
 
   const handleLogin = async () => {
-    try {
-      await signInWithEmailAndPassword(auth, email, password);
-      router.replace("/home"); 
-    } catch (err) {
-      setError(err.message);
-    }
-  };
+  try {
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
+
+    const token = await user.getIdToken(true);
+    setIdToken(token);
+    await AsyncStorage.setItem("firebaseIdToken", token);
+
+    router.replace("/home");
+  } catch (err) {
+    setError(err.message);
+  }
+};
 
   const handleFacebook = () => {
     console.log("Signup pressed");

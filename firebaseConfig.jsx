@@ -1,5 +1,11 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
+import {
+  getAuth,
+  getReactNativePersistence,
+  initializeAuth,
+} from "firebase/auth";
+import { Platform } from "react-native";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDTMnpT8RPKfrYsSRmyYc8i7QZuZTTrU3s",
@@ -8,8 +14,19 @@ const firebaseConfig = {
   storageBucket: "termiq-f37d7.firebasestorage.app",
   messagingSenderId: "625210482750",
   appId: "1:625210482750:web:5a9ee773947f34b051716f",
-  measurementId: "G-DZNWKFSCET"
+  measurementId: "G-DZNWKFSCET",
 };
 
 const app = initializeApp(firebaseConfig);
-export const auth = getAuth(app);
+
+let auth;
+if (Platform.OS === "web") {
+  auth = getAuth(app);
+} else {
+  auth = initializeAuth(app, {
+    persistence: getReactNativePersistence(AsyncStorage),
+  });
+}
+
+export { auth };
+ 

@@ -81,8 +81,8 @@ export default function Index() {
         <View style={styles.imageContainer}>
     <Image
       source={require('../assets/images/Blob.png')}
-      style={styles.image}
-      resizeMode="contain"
+      style={styles.imageBg}
+      resizeMode="stretch"
     />
 
     <View style={styles.welcome}>
@@ -124,7 +124,7 @@ export default function Index() {
           <Text style={styles.loginText}>LOG IN</Text>
         </Pressable>
         
-        <View styles={styles.field}>
+        <View style={styles.field}>
           <Text  style={styles.fp}>Forgot Password?</Text>
         </View>
 

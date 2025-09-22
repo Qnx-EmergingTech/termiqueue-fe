@@ -8,10 +8,11 @@ import {
   RobotoMono_500Medium,
   RobotoMono_700Bold,
 } from "@expo-google-fonts/roboto-mono";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../firebaseConfig";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 import styles from "../src/styles/styles";
 import Checkbox from 'expo-checkbox';
+import { auth } from "../firebaseConfig";
+import { Alert } from "react-native";
 
 
 SplashScreen.preventAutoHideAsync();
@@ -21,6 +22,7 @@ export default function Index() {
   const [appIsReady, setAppIsReady] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [accepted, setAccepted] = useState(false);
 
@@ -44,15 +46,6 @@ export default function Index() {
     return null;
   }
 
-  // const handleLogin = async () => {
-  //   try {
-  //     await signInWithEmailAndPassword(auth, email, password);
-  //     router.replace("/home"); 
-  //   } catch (err) {
-  //     setError(err.message);
-  //   }
-  // };
-
   const handleFacebook = () => {
     console.log("Signup pressed");
   };
@@ -61,8 +54,41 @@ export default function Index() {
     console.log("Signup pressed");
   };
 
-  const handleProceed = () => {
-    router.push('/kyc'); 
+  const handleProceed = async () => {
+    setError("");
+
+    if (!accepted) {
+      setError("Please accept the privacy policy.");
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
+
+    try {
+      const userCred = await createUserWithEmailAndPassword(auth, email, password);
+      console.log("User created:", userCred.user);
+      Alert.alert("Success", "Your account has been created!");
+      router.replace("/kyc");
+    } catch (err) {
+      let msg;
+    switch (err.code) {
+      case "auth/email-already-in-use":
+        msg = "This email is already registered. Try logging in instead.";
+        break;
+      case "auth/invalid-email":
+        msg = "Please enter a valid email address.";
+        break;
+      case "auth/weak-password":
+        msg = "Password must be at least 6 characters.";
+        break;
+      default:
+        msg = "Something went wrong. Please try again.";
+    }
+    setError(msg);
+    }
   };
 
   return (
@@ -80,11 +106,11 @@ export default function Index() {
         <View style={styles.imageContainer}>
     <Image
       source={require('../assets/images/Blob.png')}
-      style={styles.image}
-      resizeMode="contain"
+      style={styles.imageBg}
+      resizeMode="cover"
     />
 
-    <View style={styles.create}>
+    <View style={styles.welcome}>
       <Text style={styles.heading}>Create your account</Text>
 
       <Pressable style={styles.fbButton} onPress={handleFacebook}>
@@ -122,8 +148,8 @@ export default function Index() {
             style={styles.input}
             placeholder="Confirm password"
             secureTextEntry
-            value={password}
-            onChangeText={setPassword}
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
           />
         </View>
 

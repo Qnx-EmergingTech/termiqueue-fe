@@ -1,4 +1,4 @@
-import { View, Text, Pressable } from "react-native";
+import { View, Text, Pressable, ImageBackground } from "react-native";
 import { useFonts, Roboto_400Regular, Roboto_700Bold, Roboto_300Light, Roboto_500Medium } from "@expo-google-fonts/roboto";
 import styles from "../src/styles/styles";
 import { Link, Stack, useRouter } from "expo-router";
@@ -26,29 +26,30 @@ export default function Index() {
       <View style={styles.container}>
         <View style={styles.imageContainer}>
           <Image
-            source={require('../assets/images/Frame.png')}   // see note below for .svg
+            source={require('../assets/images/Frame.png')}
             style={styles.image}
-          />
+            resizeMode="cover" />
 
           <Text style={styles.headingOnImage}>Termi-Q</Text>
         </View>
-
         <View style={styles.textSection}>
-          <Text style={styles.mid}>Get in line without standing in one.</Text>
-          <Text style={styles.label}>
-            Join the queue from your phone and breeze through the terminal.
-          </Text>
-        </View>
+          <View>
+            <Text style={styles.mid}>Get in line without standing in one.</Text>
+            <Text style={styles.label}>
+              Join the queue from your phone and breeze through the terminal.
+            </Text>
+          </View>
 
-        <Pressable style={styles.loginButton} onPress={handleSignup}>
-          <Text style={styles.loginText}>SIGN UP</Text>
-        </Pressable>
+          <Pressable style={styles.loginButton} onPress={handleSignup}>
+            <Text style={styles.loginText}>SIGN UP</Text>
+          </Pressable>
 
-        <View style={styles.bottom}>
-          <Text style={styles.bot}>ALREADY HAVE AN ACCOUNT? </Text>
-          <Link href="/login" style={[styles.bot, styles.italic]}>
-            LOG IN
-          </Link>
+          <View style={styles.bottom}>
+            <Text style={styles.bot}>ALREADY HAVE AN ACCOUNT? </Text>
+            <Link href="/login" style={[styles.bot, styles.italic]}>
+              LOG IN
+            </Link>
+          </View>
         </View>
       </View>
     </>

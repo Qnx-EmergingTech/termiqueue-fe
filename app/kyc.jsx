@@ -75,8 +75,8 @@ export default function Index() {
         <View style={styles.imageContainer}>
             <ImageBackground
                 source={require("../assets/images/Blob.png")}
-                style={styles.image}        
-                resizeMode="cover"
+                style={styles.imageBg}        
+                resizeMode="stretch"
             />
             <View style={styles.create}>
                 <Text style={styles.heading}>Create your account</Text>
@@ -91,35 +91,40 @@ export default function Index() {
             value={firstname}
             onChangeText={setFirstName}
           />
-        
+        </View>
+        <View style={styles.field}>
           <TextInput
             style={styles.input}
             placeholder="Middle Name (Optional)"
             value={middlename}
             onChangeText={setMiddleName}
           />
-        
+        </View>
+        <View style={styles.field}>
           <TextInput
             style={styles.input}
             placeholder="Last Name"
             value={lastname}
             onChangeText={setLastName}
           />
-        
+        </View>
+        <View style={styles.field}>
           <TextInput
             style={styles.input}
             placeholder="Birthdate"
             value={birthdate}
             onChangeText={setBirthdate}
           />
-    
+        </View>
+        <View style={styles.field}>
           <TextInput
             style={styles.input}
             placeholder="Full address"
             value={address}
             onChangeText={setAddress}
           />
-
+        </View>
+        <View style={styles.field}>
           <TextInput
             style={styles.input}
             placeholder="Contact number"

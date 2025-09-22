@@ -1,12 +1,10 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet, Dimensions } from "react-native";
+const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "flex-end",
-    alignItems: "center",
     backgroundColor: "white",
-    padding: 30,
   },
 
   headingWrapper: {
@@ -59,6 +57,7 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
     marginTop: 5,
     marginBottom: 80,
+    textAlign: "center",
   },
 
   italic: {
@@ -68,7 +67,6 @@ const styles = StyleSheet.create({
 
   field: {
     marginBottom: 10,
-    width: "100%",
   },
 
   input: {
@@ -79,72 +77,81 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     fontSize: 11,
     fontFamily: "Roboto_300Light",
-    marginTop: 6,
-    width: "100%",
+    marginTop: 5,
+    width: screenWidth * 0.83,
     backgroundColor: "#F2F3F7",
     color: "#A1A4B2",
     letterSpacing: 1,
+    alignSelf: "center",
   },
 
   imageContainer: {
-  position: 'relative', 
-  width: 360,
-  height: 440,
-},
+    flex: 1,
+    backgroundColor: 'white',
+  },
 
 image: {
-  width: '100%',
-  height: '100%',
+  position: 'absolute',
+  top: 0,          
+  left: 0,
+  right: 0,
+  height: screenHeight * 0.6,
+  width:  '100%'
 },
 
 headingOnImage: {
-  position: 'absolute',
-  top: '13%',            
-  left: '50%',           
-  transform: [{ translateX: -50 }, { translateY: -10 }],
   color: 'black',
   fontSize: 16,
   fontFamily: 'Roboto_700Bold',
-  textAlign: 'center',
   letterSpacing: 4,
+  marginTop: 40,
+  textAlign: 'center',
+},
+
+textSection: {
+  padding: 30,
+  alignSelf: 'center',
+  justifyContent: 'center',
 },
 
 imageBg: {
-  position: "absolute",
-  top: 0,
-  left: 0, 
-  width: 100,
-  height: 100,
+  position: 'absolute',
+  top: 0,          
+  left: 0,
+  right: 0,
+  height: screenHeight * 0.45,
+  width:  '100%'
 },
 
 welcome: {
   position: 'absolute',
-  top: '60%',    
+  top: screenHeight * 0.2,    
   left: '21%',                 
   transform: [{ translateX: -50 }, { translateY: -10 }],
   justifyContent: "center",
   alignItems: "center",
-  width: "85%",
+  width: screenWidth * 0.85,
 },
 
 create: {
   position: 'absolute',
-  top: '50%',    
-  left: '21%',                 
+  top: screenHeight * 0.13,    
+  left: screenWidth * 0.21,                
   transform: [{ translateX: -50 }, { translateY: -10 }],
   justifyContent: "center",
   alignItems: "center",
-  width: "85%",
+  width: screenWidth * 0.82,
 },
- 
+
   loginButton: {
     backgroundColor: "#096B72",
     paddingVertical: 12,
     paddingHorizontal: 24,
     borderRadius: 20,
-    marginTop: 50,
+    marginTop: 20,
     marginBottom: 10,
-    alignSelf: "stretch",
+    alignSelf: "center",
+    width: screenWidth * 0.83,
     alignItems: "center",
   },
 
@@ -155,8 +162,9 @@ create: {
     borderRadius: 20,
     marginTop: 10,
     marginBottom: 50,
-    alignSelf: "stretch",
+    width: screenWidth * 0.83,
     alignItems: "center",
+    alignSelf: "center",
   },
 
   registerButton:{
@@ -166,8 +174,9 @@ create: {
     borderRadius: 20,
     marginTop: 10,
     marginBottom: 10,
-    alignSelf: "stretch",
+    alignSelf: "center",
     alignItems: "center",
+    width: screenWidth * 0.83,
   },
 
   loginText: {
@@ -190,13 +199,14 @@ create: {
 
   bottom: {
     flexDirection: "row",
-    marginBottom: 45,
+    marginBottom: 60,
+    justifyContent: 'center',
   },
 
   pp: {
     flexDirection: "row",
     marginBottom: 45,
-    alignSelf: "flex-start",
+    alignSelf: "center",
     letterSpacing: 0.5,
     alignItems: "center",
   },
@@ -229,6 +239,14 @@ create: {
     borderWidth: 1,
     borderColor: '#EBEAEC', 
   },
+
+  error: {
+  color: "#e63946",        
+  marginTop: 10,
+  fontSize: 14,
+  fontFamily: "RobotoMono_500Medium",
+  textAlign: "center",
+}
 });
 
 export default styles;

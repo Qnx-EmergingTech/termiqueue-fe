@@ -52,7 +52,7 @@ export default function Index() {
     setIdToken(token);
     await AsyncStorage.setItem("firebaseIdToken", token);
 
-    router.replace("/home");
+    router.replace("/accessModal");
   } catch (err) {
     setError(err.message);
   }

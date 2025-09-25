@@ -47,7 +47,7 @@ export default function Index() {
   }
 
   const handleFacebook = () => {
-    console.log("Signup pressed");
+    router.push('/home');
   };
 
   const handleGoogle = () => {

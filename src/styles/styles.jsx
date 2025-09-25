@@ -69,6 +69,18 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
 
+  inputWrapper: {
+    position: 'relative',
+    justifyContent: 'center',
+  },
+
+  icon: {
+    position: 'absolute',
+    right: 50,
+    top: '50%',
+    transform: [{ translateY: -11 }],
+  },
+
   input: {
     borderWidth: 1,
     borderColor: "#F2F3F7",
@@ -246,7 +258,8 @@ create: {
   fontSize: 14,
   fontFamily: "RobotoMono_500Medium",
   textAlign: "center",
-}
+},
+
 });
 
 export default styles;

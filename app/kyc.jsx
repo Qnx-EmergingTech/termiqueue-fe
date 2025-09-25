@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Text, View, TextInput, Pressable, ImageBackground } from "react-native";
+import { Text, View, TextInput, Pressable, ImageBackground, Platform, TouchableOpacity } from "react-native";
 import { Stack, Link, useRouter } from "expo-router";
 import * as Font from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
@@ -8,11 +8,11 @@ import {
   RobotoMono_500Medium,
   RobotoMono_700Bold,
 } from "@expo-google-fonts/roboto-mono";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { getIdToken } from "firebase/auth";
 import { auth } from "../firebaseConfig";
 import styles from "../src/styles/styles";
-import Checkbox from 'expo-checkbox';
-
+import { Ionicons } from "@expo/vector-icons";
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -26,6 +26,8 @@ export default function Index() {
   const [contact, setContact] = useState("");
   const [birthdate, setBirthdate] = useState("");
   const [error, setError] = useState("");
+  const [showPicker, setShowPicker] = useState(false);
+  const openPicker = () => setShowPicker(true);
 
   useEffect(() => {
     async function prepare() {
@@ -47,18 +49,43 @@ export default function Index() {
     return null;
   }
 
-  // const handleLogin = async () => {
-  //   try {
-  //     await signInWithEmailAndPassword(auth, email, password);
-  //     router.replace("/home"); 
-  //   } catch (err) {
-  //     setError(err.message);
-  //   }
-  // };
+async function handleProceed() {
+     try {
+    const user = auth.currentUser;
+    if (!user) throw new Error("Not signed in");
 
-  const handleProceed = () => {
-    console.log("Signup pressed");
-  };
+    const idToken = await getIdToken(user, /* forceRefresh */ true);
+
+    const response = await fetch("http://localhost:8000/profiles/", { 
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${idToken}`,
+      },
+      body: JSON.stringify({
+        first_name: firstname,
+        middle_name: middlename || null,
+        last_name: lastname,
+        birthdate: birthdate,
+        address: address,
+        is_privileged: false,
+        in_queue: false,
+      }),
+    });
+
+    if (!response.ok) {
+      const err = await response.json();
+      throw new Error(err.message || "Failed to submit KYC");
+    }
+
+    console.log("KYC submitted successfully");
+
+    router.push('/accessModal');
+  } catch (e) {
+    console.error(e);
+    setError(e.message);
+  }
+};
 
   return (
     <>
@@ -109,13 +136,37 @@ export default function Index() {
           />
         </View>
         <View style={styles.field}>
-          <TextInput
-            style={styles.input}
-            placeholder="Birthdate"
-            value={birthdate}
-            onChangeText={setBirthdate}
-          />
-        </View>
+          <View style={styles.inputWrapper}>
+        <TextInput
+          style={[styles.input, { paddingRight: 40 }]}
+          placeholder="Birthdate (YYYY-MM-DD)"
+          value={birthdate}
+          onChangeText={setBirthdate}               
+          keyboardType="numbers-and-punctuation"
+          onFocus={openPicker}                       
+        />
+        <TouchableOpacity style={styles.icon} onPress={openPicker}>
+          <Ionicons name="calendar-outline" size={22} color="#555" />
+        </TouchableOpacity>
+      </View>
+
+      {showPicker && (
+        <DateTimePicker
+          value={birthdate ? new Date(birthdate) : new Date()}
+          mode="date"
+          display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+          maximumDate={new Date()}
+          onChange={(event, selectedDate) => {
+            if (Platform.OS === 'android') setShowPicker(false);
+            if (selectedDate) {
+              const iso = selectedDate.toISOString().split('T')[0];
+              setBirthdate(iso);                     
+            }
+          }}
+          onTouchCancel={() => setShowPicker(false)}
+        />
+      )}
+    </View>
         <View style={styles.field}>
           <TextInput
             style={styles.input}

@@ -32,12 +32,12 @@ export default function accessModal() {
 
   const closeAndGoHome = () => {
     setVisible(false);
-    setTimeout(() => router.replace('/(tabs)/home'), 150);
+    setTimeout(() => router.replace('/home'), 150);
   };
 
   const handleConfirm = () => {
     setVisible(false);           
-    router.replace('/(tabs)/home');          
+    router.replace('/home');          
   };
 
   return (

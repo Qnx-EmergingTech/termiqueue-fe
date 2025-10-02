@@ -13,8 +13,20 @@ const hstyles = StyleSheet.create({
         fontSize: 20,
     },
     title: {
-        fontFamily: "Roboto_300Light",
+        fontFamily: "Roboto_400Regular",
         fontSize: 20,
+        color: "#A1A4B2",
+    },
+    btitle: {
+        fontFamily: "Roboto_700Bold",
+        fontSize: 18,
+        color: "white",
+        marginBottom: 5
+    },
+    stitle: {
+        fontFamily: "Roboto_500Medium",
+        fontSize: 11,
+        color: "white",
     },
     out: {
         fontFamily: "Roboto_700Bold",
@@ -24,6 +36,42 @@ const hstyles = StyleSheet.create({
     outtext: {
         fontFamily: "Roboto_400Regular",
         fontSize: 16,
+    },
+    map: {
+    width: Dimensions.get('window').width * 0.9,
+    height: Dimensions.get('window').height * 0.38,
+    borderRadius: 12,
+    marginTop: 30,
+    marginBottom: 20,
+    },
+    proceedButton: {
+    backgroundColor: "#8C8C8C",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingVertical: 16,
+    paddingHorizontal: 24,
+    borderRadius: 10,
+    marginTop: 10,
+    width: screenWidth * 0.83,
+    alignItems: "center",
+    alignSelf: "center",
+  },
+    textContainer: {
+    flexDirection: "column",
+    },
+    try: {
+        flex: 1,
+        justifyContent: "flex-end",
+        marginBottom: 40,
+    },
+    icon: {
+        width: 32,
+        height: 32,
+        borderRadius: 16,          
+        borderWidth: 1.5,           
+        borderColor: "white",       // border color
+        alignItems: "center",       // center horizontally
+        justifyContent: "center",
     }
 });
 

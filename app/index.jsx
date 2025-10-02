@@ -2,7 +2,9 @@ import { View, Text, Pressable, ImageBackground } from "react-native";
 import { useFonts, Roboto_400Regular, Roboto_700Bold, Roboto_300Light, Roboto_500Medium } from "@expo-google-fonts/roboto";
 import styles from "../src/styles/styles";
 import { Link, Stack, useRouter } from "expo-router";
+import * as SplashScreen from "expo-splash-screen";
 import { Image } from "react-native";
+import { useEffect } from "react";
 
 export default function Index() {
   const router = useRouter();
@@ -12,6 +14,12 @@ export default function Index() {
     Roboto_700Bold,
     Roboto_500Medium,
   });
+
+  useEffect(() => {
+    if (fontsLoaded) {
+      SplashScreen.hideAsync(); 
+    }
+  }, [fontsLoaded]);
 
   if (!fontsLoaded) return null;
 

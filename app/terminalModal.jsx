@@ -18,7 +18,7 @@ import {
 import { Image } from 'react-native';
 
 
-export default function accessModal() {
+export default function terminalModal() {
   const router = useRouter();
   const [visible, setVisible] = useState(true);
   const [fontsLoaded] = useFonts({
@@ -32,12 +32,17 @@ export default function accessModal() {
 
   const closeAndGoHome = () => {
     setVisible(false);
-    setTimeout(() => router.replace('/login'), 150);
+    setTimeout(() => router.replace('/home'), 150);
   };
 
   const handleConfirm = () => {
     setVisible(false);           
-    router.replace('/login');          
+    router.replace('/qr');          
+  };
+
+  const handleCancel = () => {
+    setVisible(false);           
+    router.replace('/terminal');          
   };
 
   return (
@@ -57,16 +62,20 @@ export default function accessModal() {
                 <Ionicons name="close" size={24} color="#333" />
               </Pressable>
               <Image
-                source={require('../assets/images/success.png')}
+                source={require('../assets/images/alert.png')}
                 style={styles.icon}
               />
-              <Text style={styles.title}>Account verified!</Text>
+              <Text style={styles.title}>Select terminal?</Text>
               <Text style={styles.text}>
-                Please check your email to verify your account.
+                This bus is already here, if you didn't make it, your queue prioritization would just go down but you will still be able to queue.
               </Text>
 
               <Pressable style={styles.button} onPress={handleConfirm}>
                 <Text style={styles.cbutton}>Confirm</Text>
+              </Pressable>
+
+              <Pressable style={styles.button2} onPress={handleCancel}>
+                <Text style={styles.cancelbutton}>Cancel</Text>
               </Pressable>
             </View>
           </TouchableWithoutFeedback>
@@ -111,6 +120,11 @@ const styles = StyleSheet.create({
     fontFamily: "Inter_600SemiBold",
     color: "white",
   },
+  cancelbutton:{
+    fontFamily: "Inter_600SemiBold",
+    color: "#096B72",
+    textAlign: "justify",
+  },
   button: {
     backgroundColor: "#096B72",
     borderRadius: 20,
@@ -118,6 +132,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     alignItems: 'center',
     marginTop: 20,
+  },
+  button2: {
+    backgroundColor: "white",
+    borderRadius: 20,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    alignItems: 'center',
+    marginTop: 5,
+    borderColor: "#096B72",
+    borderWidth: 1,
   },
   icon: {
     width: 48,

@@ -13,6 +13,7 @@ import { auth } from "../firebaseConfig";
 import styles from "../src/styles/styles";
 import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { getToken } from "../src/utils/authStorage";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -28,6 +29,8 @@ export default function Index() {
   const [error, setError] = useState("");
   const [showPicker, setShowPicker] = useState(false);
   const openPicker = () => setShowPicker(true);
+
+  const apiUrl = process.env.EXPO_PUBLIC_API_BASE_URL;
 
   useEffect(() => {
     async function prepare() {
@@ -54,13 +57,12 @@ async function handleProceed() {
     const user = auth.currentUser;
     if (!user) throw new Error("Not signed in");
 
-    const idToken = await getIdToken(user, /* forceRefresh */ true);
-
-    const response = await fetch("http://localhost:8000/profiles/", { 
+    const token = await getToken();
+    const response = await fetch(`${apiUrl}/profiles/`, { 
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${idToken}`,
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
         first_name: firstname,

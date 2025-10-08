@@ -1,19 +1,22 @@
 import { useState, useEffect } from "react";
-import { Text, View, Image, ScrollView, Pressable } from "react-native";
+import { Text, View, Image, ScrollView, Pressable, TextInput } from "react-native";
 import { Stack, useRouter } from "expo-router";
 import * as Font from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 import {
   Roboto_700Bold,
 } from "@expo-google-fonts/roboto";
-import { StyleSheet } from "react-native";
+import { StyleSheet, Dimensions } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+
 
 SplashScreen.preventAutoHideAsync();
 
 export default function Index() {
   const router = useRouter();
   const [appIsReady, setAppIsReady] = useState(false);
-  const [error, setError] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
   useEffect(() => {
     async function prepare() {
@@ -55,6 +58,16 @@ export default function Index() {
 
       <View style={styles.container}>
         <View style={styles.welcome}>
+          <View style={styles.searchContainer}>
+            <Ionicons name="search" size={20} color="#A1A4B2" style={styles.searchIcon} />
+              <TextInput
+                style={styles.searchInput}
+                placeholder="Search for a terminal..."
+                placeholderTextColor="#A1A4B2"
+                value={searchQuery}
+                onChangeText={setSearchQuery}
+              />
+            </View>
             <Text style={styles.heading}>Terminal 1</Text>
             <Pressable onPress={() => router.push("/terminalModal")}>
             <View style={styles.imageContainer}>
@@ -198,5 +211,27 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: "white",
     padding: 20,
-  }
+  },
+  searchContainer: {
+  flexDirection: "row",
+  alignItems: "center",
+  backgroundColor: "#fff",
+  borderRadius: 20,
+  paddingHorizontal: 10,
+  paddingVertical: 10,
+  marginBottom: 20,
+  elevation: 3,
+  shadowColor: "#000", 
+  shadowOpacity: 0.1,
+  shadowOffset: { width: 0, height: 2 },
+  width: Dimensions.get('window').width * 0.9,
+},
+searchIcon: {
+  marginRight: 8,
+},
+searchInput: {
+  flex: 1,
+  fontSize: 16,
+  color: "#A1A4B2",
+}
 });

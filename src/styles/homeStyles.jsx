@@ -65,12 +65,9 @@ const hstyles = StyleSheet.create({
         marginBottom: 40,
     },
     icon: {
-        width: 32,
-        height: 32,
-        borderRadius: 16,          
-        borderWidth: 1.5,           
-        borderColor: "white",       // border color
-        alignItems: "center",       // center horizontally
+        width: 34,
+        height: 34,       
+        alignItems: "center",       
         justifyContent: "center",
     }
 });

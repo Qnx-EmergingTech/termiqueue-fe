@@ -8,10 +8,10 @@ import {
   RobotoMono_500Medium,
   RobotoMono_700Bold,
 } from "@expo-google-fonts/roboto-mono";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { signInWithEmailAndPassword, getIdToken } from "firebase/auth";
 import { auth } from "../firebaseConfig";
 import styles from "../src/styles/styles";
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { setToken } from "../src/utils/authStorage";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -21,7 +21,6 @@ export default function Index() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [idToken, setIdToken] = useState("");
 
   useEffect(() => {
     async function prepare() {
@@ -48,9 +47,8 @@ export default function Index() {
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
 
-    const token = await user.getIdToken(true);
-    setIdToken(token);
-    await AsyncStorage.setItem("firebaseIdToken", token);
+    const idToken = await getIdToken(user, true);
+    await setToken(idToken);
 
     router.replace("/accessModal");
   } catch (err) {

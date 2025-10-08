@@ -8,11 +8,12 @@ import {
   RobotoMono_500Medium,
   RobotoMono_700Bold,
 } from "@expo-google-fonts/roboto-mono";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, getIdToken } from "firebase/auth";
 import styles from "../src/styles/styles";
 import Checkbox from 'expo-checkbox';
 import { auth } from "../firebaseConfig";
 import { Alert } from "react-native";
+import { setToken } from "../src/utils/authStorage";
 
 
 SplashScreen.preventAutoHideAsync();
@@ -69,7 +70,12 @@ export default function Index() {
 
     try {
       const userCred = await createUserWithEmailAndPassword(auth, email, password);
-      console.log("User created:", userCred.user);
+      const user = userCred.user;
+
+      const idToken = await getIdToken(user, true);
+      await setToken(idToken);
+      
+      console.log("User created:", user.email);
       Alert.alert("Success", "Your account has been created!");
       router.replace("/kyc");
     } catch (err) {

@@ -152,7 +152,7 @@ export default function Home() {
               <>
                 <Text style={hstyles.out}>Out of range!</Text>
                 <Text style={hstyles.outtext}>
-                   You are currently out of range, please go near the terminal.
+                   You are currently out of range, please go near the One Ayala terminal.
                 </Text>
               </>
             )}

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Text, View, TextInput, Pressable, ImageBackground, Platform, TouchableOpacity } from "react-native";
+import { Text, View, TextInput, Pressable, ImageBackground, Platform, TouchableOpacity, ScrollView, KeyboardAvoidingView, } from "react-native";
 import { Stack, Link, useRouter } from "expo-router";
 import * as Font from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
@@ -28,7 +28,7 @@ export default function Index() {
   const [birthdate, setBirthdate] = useState("");
   const [error, setError] = useState("");
   const [showPicker, setShowPicker] = useState(false);
-  const openPicker = () => setShowPicker(true);
+  const togglePicker = () => setShowPicker((prev) => !prev);
 
   const apiUrl = process.env.EXPO_PUBLIC_API_BASE_URL;
 
@@ -100,6 +100,11 @@ async function handleProceed() {
         }}
       />
 
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+      >
+
       <View style={styles.container}>
         <View style={styles.imageContainer}>
             <ImageBackground
@@ -111,6 +116,21 @@ async function handleProceed() {
                 <Text style={styles.heading}>Create your account</Text>
             </View>
         </View>
+
+        <ScrollView
+            contentContainerStyle={{
+              paddingTop: 170,
+              paddingBottom: 60,
+            }}
+            showsVerticalScrollIndicator={false}
+            style={{
+              flex: 1,
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+            }}
+        >
 
         <View style={styles.field}>
           <TextInput
@@ -145,28 +165,35 @@ async function handleProceed() {
           value={birthdate}
           onChangeText={setBirthdate}               
           keyboardType="numbers-and-punctuation"
-          onFocus={openPicker}                       
+          onFocus={() => setShowPicker(true)}                       
         />
-        <TouchableOpacity style={styles.icon} onPress={openPicker}>
+        <TouchableOpacity style={styles.icon} onPress={togglePicker}>
           <Ionicons name="calendar-outline" size={22} color="#555" />
         </TouchableOpacity>
       </View>
 
       {showPicker && (
+        <View style={{ alignItems: 'center', justifyContent: 'center' }}>
         <DateTimePicker
           value={birthdate ? new Date(birthdate) : new Date()}
           mode="date"
-          display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+          display={Platform.OS === "ios" ? "spinner" : "default"}
           maximumDate={new Date()}
           onChange={(event, selectedDate) => {
-            if (Platform.OS === 'android') setShowPicker(false);
-            if (selectedDate) {
-              const iso = selectedDate.toISOString().split('T')[0];
-              setBirthdate(iso);                     
+            if (event.type === "dismissed") {
+            setShowPicker(false);
+            return;
             }
+
+            if (selectedDate) {
+            const iso = selectedDate.toISOString().split("T")[0];
+            setBirthdate(iso);
+            }
+
+            setShowPicker(false); 
           }}
-          onTouchCancel={() => setShowPicker(false)}
         />
+        </View>
       )}
     </View>
         <View style={styles.field}>
@@ -202,8 +229,9 @@ async function handleProceed() {
             SIGN UP
           </Link>
         </View>
-        
+        </ScrollView>
       </View>
+      </KeyboardAvoidingView>
     </>
   );
 }

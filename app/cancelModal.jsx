@@ -1,4 +1,4 @@
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import React, { useState } from 'react';
 import {
   Modal,
@@ -6,8 +6,11 @@ import {
   Text,
   Pressable,
   StyleSheet,
-  TouchableWithoutFeedback
+  TouchableWithoutFeedback,
+  Image,
+  Alert
 } from 'react-native';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Ionicons } from '@expo/vector-icons';
 import { Stack } from "expo-router";
 import {
@@ -15,8 +18,6 @@ import {
   Inter_400Regular,
   Inter_600SemiBold,
 } from '@expo-google-fonts/inter';
-import { Image } from 'react-native';
-
 
 export default function cancelModal() {
   const router = useRouter();
@@ -26,24 +27,53 @@ export default function cancelModal() {
     Inter_600SemiBold,
   });
 
-  if (!fontsLoaded) {
-    return null;
-  }
+  const { queueId } = useLocalSearchParams();
+  const apiUrl = process.env.EXPO_PUBLIC_API_BASE_URL;
 
   const closeAndGoHome = () => {
     setVisible(false);
     setTimeout(() => router.replace('/qr'), 150);
   };
 
-  const handleConfirm = () => {
-    setVisible(false);           
-    router.replace('/terminal');          
+  const handleConfirm = async () => {
+    try {
+      const token = await AsyncStorage.getItem("firebaseIdToken");
+      if (!token) {
+        Alert.alert("Error", "No authentication token found");
+        return;
+      }
+
+      const response = await fetch(`${apiUrl}/queues/${queueId}/leave`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        const errData = await response.json();
+        console.error("Leave queue failed:", errData);
+        Alert.alert("Error", errData.detail || "Failed to leave queue");
+        return;
+      }
+
+      setVisible(false);
+      router.replace("/terminal");
+    } catch (error) {
+      console.error("Error leaving queue:", error);
+      Alert.alert("Error", "Something went wrong");
+    }
   };
 
   const handleCancel = () => {
     setVisible(false);           
     router.replace('/qr');          
   };
+
+  if (!fontsLoaded) {
+    return null;
+  }
 
   return (
     <>
@@ -67,7 +97,7 @@ export default function cancelModal() {
               />
               <Text style={styles.title}>Are you sure you want to cancel?</Text>
               <Text style={styles.text}>
-                Canceling means you will be removed from the queue, are yous sure?
+                Canceling means you will be removed from the queue, are you sure?
               </Text>
 
               <Pressable style={styles.button} onPress={handleConfirm}>

@@ -20,7 +20,8 @@ export default function Terminals() {
   const router = useRouter();
   const [appIsReady, setAppIsReady] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [terminals, setTerminals] = useState([]);
+  const [terminals, setTerminals] = useState([])
+  const [currentQueueId, setCurrentQueueId] = useState(null);
 
   const apiUrl = process.env.EXPO_PUBLIC_API_BASE_URL;
 
@@ -54,11 +55,11 @@ export default function Terminals() {
   try {
     const token = await AsyncStorage.getItem("firebaseIdToken");
     if (!token) {
-      console.warn("No auth token found");
+      Alert.alert("Error", "You must be logged in to join a queue.");
       return;
     }
 
-    const response = await fetch(`${apiUrl}/queues/${terminalId}/join`, {
+    const joinResponse = await fetch(`${apiUrl}/queues/${terminalId}/join`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -66,32 +67,64 @@ export default function Terminals() {
       },
     });
 
-    const data = await response.json();
+    const joinData = await joinResponse.json();
 
-    if (!response.ok) {
-      console.error("Join queue failed:", response.status, data);
+    if (joinData?.detail === "User already in queue") {
+      console.warn("⚠️ User already in queue");
 
-      if (data?.detail?.includes("already joined")) {
-        Alert.alert("You're already in a queue", "Redirecting you to your QR...");
-        router.push("/qr");
-      } else {
-        Alert.alert("Error", data?.detail || "Failed to join queue");
+      const savedQueueId = await AsyncStorage.getItem("currentQueueId");
+      if (!savedQueueId) {
+        console.log("💾 Saving currentQueueId since it was missing...");
+        await AsyncStorage.setItem("currentQueueId", terminalId.toString());
       }
+
+      const updatedQueueId = await AsyncStorage.getItem("currentQueueId");
+     
+      const savedId = updatedQueueId?.toString();
+      const currentId = terminalId?.toString();
+
+      if (savedId && savedId === currentId) {
+        console.log("✅ Same queue detected — redirecting to QR...");
+        router.push({
+          pathname: "/qr",
+          params: { queueId: savedId },
+        });
+        return;
+      }
+
+      Alert.alert(
+        "Already in a queue",
+        "Please leave your current queue first before joining another."
+      );
       return;
     }
 
-    console.log("✅ Queue joined successfully:", data);
+    if (!joinResponse.ok) {
+      Alert.alert("Error", joinData?.detail || "Failed to join queue");
+      return;
+    }
+
+    await AsyncStorage.setItem("currentQueueId", terminalId.toString());
+    setCurrentQueueId(terminalId.toString());
+    console.log("✅ Joined queue successfully:", joinData);
 
     router.replace({
       pathname: "/qr",
       params: { queueId: terminalId },
     });
-
   } catch (error) {
     console.error("Error joining queue:", error);
     Alert.alert("Error", "Something went wrong");
   }
 };
+
+  useEffect(() => {
+  const loadCurrentQueue = async () => {
+    const savedId = await AsyncStorage.getItem("currentQueueId");
+    if (savedId) setCurrentQueueId(savedId);
+  };
+  loadCurrentQueue();
+}, []);
 
   if (!appIsReady) return null;
 
@@ -154,11 +187,22 @@ export default function Terminals() {
       />
       <View style={styles.textContainer}>
         <Text style={styles.title}>{terminal.destination}</Text>
-        <Text style={styles.subtitle}>Tap to join queue</Text>
+
+        <Text
+          style={[
+            styles.subtitle,
+            currentQueueId === terminal.id.toString() && styles.inQueueText,
+          ]}
+        >
+          {currentQueueId === terminal.id.toString()
+            ? "In Queue"
+            : "Tap to join queue"}
+        </Text>
       </View>
     </View>
   </Pressable>
 ))}
+
 
 
         </View>
@@ -219,4 +263,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#A1A4B2",
   },
+inQueueText: {
+  color: "#59A96A",
+  fontWeight: "600",
+},
 });

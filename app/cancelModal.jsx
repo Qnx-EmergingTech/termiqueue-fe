@@ -58,6 +58,9 @@ export default function cancelModal() {
         return;
       }
 
+      await AsyncStorage.removeItem("currentQueueId");
+      Alert.alert("Success", "You’ve left the queue.");
+
       setVisible(false);
       router.replace("/terminal");
     } catch (error) {

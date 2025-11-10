@@ -6,6 +6,7 @@ import { Stack, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, Alert, Pressable, Text, View } from "react-native";
 import MapView, { Marker } from 'react-native-maps';
+import { Menu, Provider as PaperProvider } from 'react-native-paper';
 import hstyles from "../src/styles/homeStyles";
 
 export default function Home() {
@@ -15,8 +16,19 @@ export default function Home() {
   const [geofenceStatus, setGeofenceStatus] = useState(null);
   const [firstName, setFirstName] = useState("");
   const [inRange, setInRange] = useState(false);
+  const [menuVisible, setMenuVisible] = useState(false);
 
   const apiUrl = process.env.EXPO_PUBLIC_API_BASE_URL;
+
+  const openMenu = () => setMenuVisible(true);
+  const closeMenu = () => setMenuVisible(false);
+
+  const handleLogout = async () => {
+    closeMenu();
+    await AsyncStorage.clear();
+    Alert.alert("Logged out", "You have been logged out.");
+    router.replace("/login");
+  };
 
   const [fontsLoaded] = useFonts({
     Roboto_400Regular,
@@ -121,12 +133,47 @@ export default function Home() {
   };
 
   return (
-  <>
+  <PaperProvider>
     <Stack.Screen options={{ headerShown: false }} />
 
     <View style={hstyles.container}>
-      <Text style={hstyles.greeting}>Hello, {firstName}!</Text>
-      <Text style={hstyles.title}>Ready to queue for yout next ride?</Text>
+      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', marginBottom: 10 }}>
+          <View style={{ flex: 1 }}>
+            <Text style={hstyles.greeting}>Hello, {firstName}!</Text>
+            <Text style={hstyles.title}>Ready to queue for your next ride?</Text>
+          </View>
+
+          <Menu
+            visible={menuVisible}
+            onDismiss={closeMenu}
+            contentStyle={{
+            backgroundColor: "white",
+            borderRadius: 5,
+            }}
+            anchor={
+              <Pressable onPress={openMenu} style={{ padding: 10 }}>
+                <Ionicons name="ellipsis-vertical" size={24} color="#A1A4B2" />
+              </Pressable>
+            }
+          >
+            <Menu.Item
+            onPress={handleLogout}
+            title="Logout"
+            leadingIcon={() => (
+              <Ionicons name="log-out-outline" size={24} color="#DB5461" />
+            )}
+            titleStyle={{
+              fontFamily: "Roboto_500Medium",
+              fontSize: 16,
+              color: "#333",
+            }}
+            style={{
+              paddingVertical: 10,
+              paddingHorizontal: 10,
+            }}
+          />
+          </Menu>
+        </View>
       
       {region && (
         <MapView
@@ -186,6 +233,6 @@ export default function Home() {
 </View>
 
     </View>
-  </>
+  </PaperProvider>
   );
 }

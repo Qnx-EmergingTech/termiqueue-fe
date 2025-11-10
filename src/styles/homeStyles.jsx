@@ -1,4 +1,4 @@
-import { StyleSheet, Dimensions } from "react-native";
+import { Dimensions, StyleSheet } from "react-native";
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
 const hstyles = StyleSheet.create({
@@ -69,7 +69,7 @@ const hstyles = StyleSheet.create({
         height: 34,       
         alignItems: "center",       
         justifyContent: "center",
-    }
+    },
 });
 
 export default hstyles;

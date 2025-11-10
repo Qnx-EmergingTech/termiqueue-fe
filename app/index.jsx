@@ -1,10 +1,9 @@
-import { View, Text, Pressable, ImageBackground } from "react-native";
-import { useFonts, Roboto_400Regular, Roboto_700Bold, Roboto_300Light, Roboto_500Medium } from "@expo-google-fonts/roboto";
-import styles from "../src/styles/styles";
+import { Roboto_300Light, Roboto_400Regular, Roboto_500Medium, Roboto_700Bold, useFonts } from "@expo-google-fonts/roboto";
 import { Link, Stack, useRouter } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
-import { Image } from "react-native";
 import { useEffect } from "react";
+import { Image, Pressable, Text, View } from "react-native";
+import styles from "../src/styles/styles";
 
 export default function Index() {
   const router = useRouter();
@@ -38,7 +37,10 @@ export default function Index() {
             style={styles.image}
             resizeMode="cover" />
 
-          <Text style={styles.headingOnImage}>Termi-Q</Text>
+          <Image source=
+            {require('../assets/images/Logo.png')}
+            style={styles.logo}
+            resizeMode="cover" />
         </View>
         <View style={styles.textSection}>
           <View>

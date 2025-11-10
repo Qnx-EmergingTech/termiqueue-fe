@@ -1,4 +1,4 @@
-import { StyleSheet, Dimensions } from "react-native";
+import { Dimensions, StyleSheet } from "react-native";
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
 const styles = StyleSheet.create({
@@ -260,6 +260,12 @@ create: {
   textAlign: "center",
 },
 
+  logo: {
+    width: 79,
+    height: 25,
+    marginTop: 40,
+    alignSelf: "center",
+  },
 });
 
 export default styles;

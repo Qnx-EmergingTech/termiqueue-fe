@@ -1,12 +1,12 @@
-import { View, Text, Pressable, ActivityIndicator, Alert } from "react-native";
-import { useFonts, Roboto_400Regular, Roboto_700Bold, Roboto_300Light, Roboto_500Medium } from "@expo-google-fonts/roboto";
-import { Stack, useRouter } from "expo-router";
-import hstyles from "../src/styles/homeStyles";
-import MapView, { Marker } from 'react-native-maps';
-import * as Location from 'expo-location';
-import { useState, useEffect } from "react";
+import { Roboto_300Light, Roboto_400Regular, Roboto_500Medium, Roboto_700Bold, useFonts } from "@expo-google-fonts/roboto";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Location from 'expo-location';
+import { Stack, useRouter } from "expo-router";
+import { useEffect, useState } from "react";
+import { ActivityIndicator, Alert, Pressable, Text, View } from "react-native";
+import MapView, { Marker } from 'react-native-maps';
+import hstyles from "../src/styles/homeStyles";
 
 export default function Home() {
   const router = useRouter();
@@ -115,7 +115,7 @@ export default function Home() {
   }
 
   const handleProceed = () => {
-    //if (!inRange) return;
+    if (!inRange) return;
     router.push('/terminal');
     console.log("Proceeding...");
   };
@@ -145,7 +145,7 @@ export default function Home() {
           <>
             {geofenceStatus?.can_join ? (
               <>
-                <Text style={[hstyles.out, { color: "#096B72" }]}>Within Range!</Text>
+                <Text style={[hstyles.out, { color: "#096B72" }]}>In Range!</Text>
                 <Text style={hstyles.outtext}>You are within the queueing area, please select your bus to queue.</Text>
               </>
             ) : (
@@ -162,7 +162,7 @@ export default function Home() {
       <View style={hstyles.try}>
   <Pressable
     onPress={handleProceed}
-   //disabled={!inRange}
+    disabled={!inRange}
     style={[
       hstyles.proceedButton,
       { backgroundColor: inRange ? "#333242" : "#8C8C8C" }, 

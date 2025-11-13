@@ -26,8 +26,7 @@ export default function Home() {
   const handleLogout = async () => {
     closeMenu();
     await AsyncStorage.clear();
-    Alert.alert("Logged out", "You have been logged out.");
-    router.replace("/login");
+    router.replace("/logoutModal");
   };
 
   const [fontsLoaded] = useFonts({

@@ -1,22 +1,11 @@
-import { useState, useEffect } from "react";
-import { Text, View, TextInput, Pressable, Image } from "react-native";
-import { Stack, Link, useRouter } from "expo-router";
-import * as Font from "expo-font";
-import * as SplashScreen from "expo-splash-screen";
-import {
-  RobotoMono_400Regular,
-  RobotoMono_500Medium,
-  RobotoMono_700Bold,
-} from "@expo-google-fonts/roboto-mono";
-import { createUserWithEmailAndPassword, getIdToken } from "firebase/auth";
-import styles from "../src/styles/styles";
 import Checkbox from 'expo-checkbox';
+import { Link, Stack, useRouter } from "expo-router";
+import { createUserWithEmailAndPassword, getIdToken } from "firebase/auth";
+import { useState } from "react";
+import { Alert, Image, Pressable, Text, TextInput, View } from "react-native";
 import { auth } from "../firebaseConfig";
-import { Alert } from "react-native";
+import styles from "../src/styles/styles";
 import { setToken } from "../src/utils/authStorage";
-
-
-SplashScreen.preventAutoHideAsync();
 
 export default function Index() {
   const router = useRouter();
@@ -26,26 +15,6 @@ export default function Index() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [accepted, setAccepted] = useState(false);
-
-  useEffect(() => {
-    async function prepare() {
-      try {
-        await Font.loadAsync({
-          RobotoMono_400Regular,
-          RobotoMono_500Medium,
-          RobotoMono_700Bold,
-        });
-      } finally {
-        setAppIsReady(true);
-        await SplashScreen.hideAsync();
-      }
-    }
-    prepare();
-  }, []);
-
-  if (!appIsReady) {
-    return null;
-  }
 
   const handleFacebook = () => {
     router.push('/home');

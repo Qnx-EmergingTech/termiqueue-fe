@@ -1,42 +1,36 @@
-import {
-    Inter_400Regular,
-    Inter_600SemiBold,
-    useFonts,
-} from '@expo-google-fonts/inter';
 import { Ionicons } from '@expo/vector-icons';
 import { Stack, useRouter } from 'expo-router';
+import { getAuth, signOut } from 'firebase/auth';
 import { useState } from 'react';
 import {
-    Image,
-    Modal,
-    Pressable,
-    StyleSheet,
-    Text,
-    TouchableWithoutFeedback,
-    View
+  Image,
+  Modal,
+  Pressable,
+  StyleSheet,
+  Text,
+  TouchableWithoutFeedback,
+  View
 } from 'react-native';
 
 
 export default function logoutModal() {
   const router = useRouter();
   const [visible, setVisible] = useState(true);
-  const [fontsLoaded] = useFonts({
-    Inter_400Regular,
-    Inter_600SemiBold,
-  });
-
-  if (!fontsLoaded) {
-    return null;
-  }
 
   const closeAndGoHome = () => {
     setVisible(false);
     setTimeout(() => router.replace('/home'), 150);
   };
 
-  const handleConfirm = () => {
-    setVisible(false);           
-    router.replace('/login');          
+  const handleConfirm = async () => {
+    const auth = getAuth();
+    try {
+      await signOut(auth);
+      setVisible(false);
+      router.replace('/login');
+    } catch (error) {
+      console.log("Logout error:", error);
+    }
   };
 
   const handleCancel = () => {

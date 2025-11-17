@@ -1,14 +1,8 @@
-import { useState, useEffect } from "react";
-import { Text, View, TextInput, Pressable, Image } from "react-native";
-import { Stack, Link, useRouter } from "expo-router";
-import * as Font from "expo-font";
+import { Link, Stack, useRouter } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
-import {
-  RobotoMono_400Regular,
-  RobotoMono_500Medium,
-  RobotoMono_700Bold,
-} from "@expo-google-fonts/roboto-mono";
-import { signInWithEmailAndPassword, getIdToken } from "firebase/auth";
+import { getIdToken, signInWithEmailAndPassword } from "firebase/auth";
+import { useState } from "react";
+import { Image, Pressable, Text, TextInput, View } from "react-native";
 import { auth } from "../firebaseConfig";
 import styles from "../src/styles/styles";
 import { setToken } from "../src/utils/authStorage";
@@ -21,26 +15,6 @@ export default function Index() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-
-  useEffect(() => {
-    async function prepare() {
-      try {
-        await Font.loadAsync({
-          RobotoMono_400Regular,
-          RobotoMono_500Medium,
-          RobotoMono_700Bold,
-        });
-      } finally {
-        setAppIsReady(true);
-        await SplashScreen.hideAsync();
-      }
-    }
-    prepare();
-  }, []);
-
-  if (!appIsReady) {
-    return null;
-  }
 
   const handleLogin = async () => {
   try {

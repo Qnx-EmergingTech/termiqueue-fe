@@ -1,42 +1,26 @@
-import { useState, useEffect } from "react";
-import {
-  Text,
-  View,
-  Image,
-  ScrollView,
-  Pressable,
-  TextInput,
-  Alert,
-  StyleSheet,
-  Dimensions,
-} from "react-native";
-import { Stack, useRouter } from "expo-router";
-import * as Font from "expo-font";
-import { Roboto_700Bold } from "@expo-google-fonts/roboto";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Stack, useRouter } from "expo-router";
+import { useEffect, useState } from "react";
+import {
+  Alert,
+  Dimensions,
+  Image,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 
 export default function Terminals() {
   const router = useRouter();
-  const [appIsReady, setAppIsReady] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [terminals, setTerminals] = useState([])
   const [currentQueueId, setCurrentQueueId] = useState(null);
 
   const apiUrl = process.env.EXPO_PUBLIC_API_BASE_URL;
-
-  useEffect(() => {
-    async function prepare() {
-      try {
-        await Font.loadAsync({
-          Roboto_700Bold,
-        });
-      } finally {
-        setAppIsReady(true);
-      }
-    }
-    prepare();
-  }, []);
 
   useEffect(() => {
   const fetchTerminals = async () => {
@@ -125,8 +109,6 @@ export default function Terminals() {
   };
   loadCurrentQueue();
 }, []);
-
-  if (!appIsReady) return null;
 
   const q = (searchQuery || "").trim().toLowerCase();
   const filteredTerminals = q.length === 0

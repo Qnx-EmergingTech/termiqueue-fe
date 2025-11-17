@@ -1,11 +1,9 @@
-import { View, Text, Image, Pressable, ActivityIndicator } from "react-native";
-import { useFonts, Roboto_400Regular, Roboto_700Bold, Roboto_300Light, Roboto_500Medium } from "@expo-google-fonts/roboto";
-import { Stack, useRouter, useLocalSearchParams } from "expo-router";
-import qrstyles from "../src/styles/qrStyles";
-import QRCode from 'react-native-qrcode-svg';
-import { Dimensions } from 'react-native';
-import { useState, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Stack, useLocalSearchParams, useRouter } from "expo-router";
+import { useEffect, useState } from "react";
+import { ActivityIndicator, Dimensions, Image, Pressable, Text, View } from "react-native";
+import QRCode from 'react-native-qrcode-svg';
+import qrstyles from "../src/styles/qrStyles";
 
 export default function Qr() {
   const router = useRouter();
@@ -16,13 +14,6 @@ export default function Qr() {
   const [queue, setQueue] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
-  const [fontsLoaded] = useFonts({
-    Roboto_300Light,
-    Roboto_700Bold,
-    Roboto_500Medium,
-    Roboto_400Regular,
-  });
 
   useEffect(() => {
   const fetchQueueDetails = async () => {
@@ -51,8 +42,6 @@ export default function Qr() {
 
   if (queueId) fetchQueueDetails();
 }, [queueId]);
-
-  if (!fontsLoaded) return null;
 
   if (loading) {
     return (

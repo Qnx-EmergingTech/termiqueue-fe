@@ -1,4 +1,3 @@
-import { Roboto_300Light, Roboto_400Regular, Roboto_500Medium, Roboto_700Bold, useFonts } from "@expo-google-fonts/roboto";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Location from 'expo-location';
@@ -28,13 +27,6 @@ export default function Home() {
     await AsyncStorage.clear();
     router.replace("/logoutModal");
   };
-
-  const [fontsLoaded] = useFonts({
-    Roboto_400Regular,
-    Roboto_300Light,
-    Roboto_700Bold,
-    Roboto_500Medium,
-  });
 
    useEffect(() => {
   const fetchProfile = async () => {
@@ -121,9 +113,6 @@ export default function Home() {
   }
 }, [geofenceStatus]);
 
-  if (!fontsLoaded) {
-    return null;
-  }
 
   const handleProceed = () => {
     if (!inRange) return;

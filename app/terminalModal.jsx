@@ -1,34 +1,20 @@
-import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
+import { Ionicons } from '@expo/vector-icons';
+import { Stack, useRouter } from 'expo-router';
+import { useState } from 'react';
 import {
+  Image,
   Modal,
-  View,
-  Text,
   Pressable,
   StyleSheet,
-  TouchableWithoutFeedback
+  Text,
+  TouchableWithoutFeedback,
+  View
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { Stack } from "expo-router";
-import {
-  useFonts,
-  Inter_400Regular,
-  Inter_600SemiBold,
-} from '@expo-google-fonts/inter';
-import { Image } from 'react-native';
 
 
 export default function terminalModal() {
   const router = useRouter();
   const [visible, setVisible] = useState(true);
-  const [fontsLoaded] = useFonts({
-    Inter_400Regular,
-    Inter_600SemiBold,
-  });
-
-  if (!fontsLoaded) {
-    return null;
-  }
 
   const closeAndGoHome = () => {
     setVisible(false);

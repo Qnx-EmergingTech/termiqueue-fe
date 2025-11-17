@@ -1,31 +1,21 @@
-import { useRouter, useLocalSearchParams } from 'expo-router';
-import React, { useState } from 'react';
+import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
+import { useState } from 'react';
 import {
+  Alert,
+  Image,
   Modal,
-  View,
-  Text,
   Pressable,
   StyleSheet,
+  Text,
   TouchableWithoutFeedback,
-  Image,
-  Alert
+  View
 } from 'react-native';
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Ionicons } from '@expo/vector-icons';
-import { Stack } from "expo-router";
-import {
-  useFonts,
-  Inter_400Regular,
-  Inter_600SemiBold,
-} from '@expo-google-fonts/inter';
 
 export default function cancelModal() {
   const router = useRouter();
   const [visible, setVisible] = useState(true);
-  const [fontsLoaded] = useFonts({
-    Inter_400Regular,
-    Inter_600SemiBold,
-  });
 
   const { queueId } = useLocalSearchParams();
   const apiUrl = process.env.EXPO_PUBLIC_API_BASE_URL;
@@ -73,10 +63,6 @@ export default function cancelModal() {
     setVisible(false);           
     router.replace('/qr');          
   };
-
-  if (!fontsLoaded) {
-    return null;
-  }
 
   return (
     <>

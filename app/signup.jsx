@@ -7,7 +7,7 @@ import { auth } from "../firebaseConfig";
 import styles from "../src/styles/styles";
 import { setToken } from "../src/utils/authStorage";
 
-export default function Index() {
+export default function Signup() {
   const router = useRouter();
   const [appIsReady, setAppIsReady] = useState(false);
   const [email, setEmail] = useState("");

@@ -1,0 +1,26 @@
+{
+  "cli": {
+    "version": ">= 16.27.0",
+    "appVersionSource": "remote"
+  },
+  "build": {
+    "development": {
+      "env": {
+        "ANDROID_GOOGLE_SERVICES_JSON": "file:google-services.json"
+      }
+    },
+    "production": {
+      "env": {
+        "ANDROID_GOOGLE_SERVICES_JSON": "file:google-services.json"
+      }
+    },
+    "preview": {
+      "android": {
+        "buildType": "apk"
+      },
+      "env": {
+        "ANDROID_GOOGLE_SERVICES_JSON": "file:google-services.json"
+      }
+    }
+  }
+}

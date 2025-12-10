@@ -3,7 +3,6 @@ import { getIdToken, signInWithEmailAndPassword } from "firebase/auth";
 import { useState } from "react";
 import { Image, Pressable, Text, TextInput, View } from "react-native";
 import { auth } from "../firebaseConfig";
-import { getDeviceToken } from "../src/services/deviceToken";
 import styles from "../src/styles/styles";
 import { setToken } from "../src/utils/authStorage";
 
@@ -22,22 +21,6 @@ export default function Index() {
 
     const idToken = await getIdToken(user, true);
     await setToken(idToken);
-
-    // Get device token
-    const deviceToken = await getDeviceToken();
-    console.log("Device Token:", deviceToken);
-
-    // Send it to backend
-    if (deviceToken) {
-      await fetch(`${apiUrl}/profiles/register-fcm`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${idToken}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ deviceToken }),
-      });
-    }
 
     router.replace("/accessModal");
   } catch (err) {

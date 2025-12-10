@@ -16,9 +16,8 @@ import {
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
-import SafeScreen from "../components/SafeScreen";
-
 import { useCallback } from "react";
+import SafeScreen from "../components/SafeScreen";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -35,6 +34,27 @@ export default function RootLayout() {
     RobotoMono_700Bold,
   });
 
+  const apiUrl = process.env.EXPO_PUBLIC_API_BASE_URL;
+
+  useEffect(() => {
+    async function setup() {
+      const granted = await requestPermission();
+      if (granted) {
+        const token = await getFCMToken();
+
+        // 👉 SEND TO BACKEND
+        if (token) {
+          await fetch(`${apiUrl}/profiles/register-fcm`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ fcmToken: token }),
+          });
+        }
+      }
+    }
+
+    setup();
+  }, []);
   const onLayoutRootView = useCallback(async () => {
     if (fontsLoaded) {
       await SplashScreen.hideAsync();

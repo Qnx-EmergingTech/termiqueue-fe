@@ -29,7 +29,7 @@ export default function Index() {
     try {
       const token = await registerForPushNotificationsAsync();
       if (token) {
-        await sendTokenToServer(token, user.uid);
+        await sendTokenToServer(token, idToken);
       }
     } catch (pushErr) {
       console.log('Push registration failed', pushErr);

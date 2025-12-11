@@ -1,9 +1,7 @@
+import messaging from '@react-native-firebase/messaging';
 import * as Device from 'expo-device';
-import * as Notifications from 'expo-notifications';
-import { Platform } from 'react-native';
 
-// Requests permissions, obtains device push token (FCM on Android / APNs on iOS),
-// and returns the token string or null.
+// Request notification permissions and get FCM token
 export async function registerForPushNotificationsAsync() {
   try {
     if (!Device.isDevice) {
@@ -11,46 +9,44 @@ export async function registerForPushNotificationsAsync() {
       return null;
     }
 
-    const { status: existingStatus } = await Notifications.getPermissionsAsync();
-    let finalStatus = existingStatus;
-    if (existingStatus !== 'granted') {
-      const { status } = await Notifications.requestPermissionsAsync();
-      finalStatus = status;
-    }
+    console.log('Requesting notification permission...');
 
-    if (finalStatus !== 'granted') {
-      console.log('Failed to get push token permission');
+    // Request permission (iOS and Android 13+)
+    const authStatus = await messaging().requestPermission();
+    const enabled =
+      authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+      authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+
+    if (!enabled) {
+      console.log('Notification permission not granted');
       return null;
     }
 
-    const tokenResponse = await Notifications.getDevicePushTokenAsync();
-    // `tokenResponse` shape: { data: '<token>' }
-    const token = tokenResponse?.data ?? null;
+    console.log('Permission granted, getting FCM token...');
 
-    // On Android, optionally configure the notification channel now
-    if (Platform.OS === 'android') {
-      await Notifications.setNotificationChannelAsync('default', {
-        name: 'default',
-        importance: Notifications.AndroidImportance.MAX,
-        vibrationPattern: [0, 250, 250, 250],
-        lightColor: '#FF231F7C',
-      });
-    }
+    // Get FCM token
+    const token = await messaging().getToken();
+    console.log('FCM Token received:', token ? 'Yes' : 'No');
 
     return token;
   } catch (error) {
-    console.log('registerForPushNotificationsAsync error', error);
+    console.log('registerForPushNotificationsAsync error:', error);
     return null;
   }
 }
 
-// Sends the token to your backend. Replace `BACKEND_URL` with your API endpoint.
+// Send token to your backend
 export async function sendTokenToServer(token, userId) {
-  if (!token) return null;
+  if (!token) {
+    console.log('No token to send');
+    return null;
+  }
 
   try {
     const BACKEND_URL = 'http://44.202.107.196:8080/profiles/register-fcm';
 
+    console.log('Sending FCM token to server...');
+    
     const res = await fetch(BACKEND_URL, {
       method: 'POST',
       headers: {
@@ -61,18 +57,30 @@ export async function sendTokenToServer(token, userId) {
     });
 
     if (!res.ok) {
-      console.log('Failed to send token to server', await res.text());
+      const errorText = await res.text();
+      console.log('Failed to send token to server:', errorText);
       return null;
     }
 
-    return await res.json();
+    const result = await res.json();
+    console.log('Token successfully sent to server');
+    return result;
   } catch (err) {
-    console.log('sendTokenToServer error', err);
+    console.log('sendTokenToServer error:', err);
     return null;
   }
+}
+
+// Listen for token refresh (optional but recommended)
+export function onTokenRefresh(callback) {
+  return messaging().onTokenRefresh(token => {
+    console.log('FCM token refreshed:', token);
+    callback(token);
+  });
 }
 
 export default {
   registerForPushNotificationsAsync,
   sendTokenToServer,
+  onTokenRefresh,
 };

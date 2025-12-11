@@ -12,7 +12,7 @@
       "supportsTablet": true
     },
     "android": {
-      "googleServicesFile": "google-services.json",
+      "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
@@ -21,13 +21,22 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.questronix.qnext"
+      "package": "com.questronix.qnext",
+      "useNextNotificationsApi": true
     },
     "web": {
       "output": "static",
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
+      "@react-native-firebase/app",
+      [
+        "@react-native-firebase/messaging",
+        {
+          "androidNotificationChannelId": "default",
+          "androidNotificationChannelName": "Default Notifications"
+        }
+      ],
       "expo-notifications",
       [
         "expo-build-properties",
@@ -62,7 +71,7 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "bc72a1ab-acde-43e5-b72e-c6618d7a14d0"
+        "projectId": "7a1bbd01-676f-4b23-9302-3ae552f9e67f"
       }
     }
   }

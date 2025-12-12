@@ -165,6 +165,7 @@ export default function Home() {
       
       {region && (
         <MapView
+          provider="google"
           style={hstyles.map}
           region={region}
           showsUserLocation

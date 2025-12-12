@@ -1,4 +1,4 @@
-import { StyleSheet, Dimensions } from "react-native";
+import { Dimensions, StyleSheet } from "react-native";
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
 const qrstyles = StyleSheet.create({
@@ -49,7 +49,7 @@ const qrstyles = StyleSheet.create({
         alignItems: "center",
         alignSelf: "center",
         position: "absolute",
-        bottom: 20,
+        bottom: 40,
     },
     confirm: {
         fontFamily: "Roboto_500Medium",

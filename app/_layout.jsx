@@ -18,11 +18,28 @@ import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import SafeScreen from "../components/SafeScreen";
 
-import { useCallback } from "react";
+import { getIdToken } from "firebase/auth";
+import { useCallback, useEffect } from "react";
+import { auth } from "../firebaseConfig";
+import { onTokenRefresh, sendTokenToServer } from "../src/utils/pushNotifications";
 
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
+  useEffect(() => {
+    // Listen for token refresh and update backend
+    const unsubscribe = onTokenRefresh(async (newToken) => {
+      const user = auth.currentUser;
+      const idToken = await getIdToken(user, true);
+      if (user && newToken) {
+        console.log('Updating refreshed token on server');
+        await sendTokenToServer(newToken, idToken);
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
+
   const [fontsLoaded] = useFonts({
     Inter_400Regular,
     Inter_600SemiBold,

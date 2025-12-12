@@ -17,105 +17,117 @@ import {
 export default function Terminals() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
-  const [terminals, setTerminals] = useState([])
+  const [terminals, setTerminals] = useState([]);
   const [currentQueueId, setCurrentQueueId] = useState(null);
 
   const apiUrl = process.env.EXPO_PUBLIC_API_BASE_URL;
 
   useEffect(() => {
-  const fetchTerminals = async () => {
-    try {
-      const response = await fetch(`${apiUrl}/queues/`);
-      const data = await response.json();
-      setTerminals(data);
-    } catch (error) {
-      console.error("Error fetching terminals:", error);
-    }
-  };
-  fetchTerminals();
-}, []);
+    const fetchTerminals = async () => {
+      try {
+        const response = await fetch(`${apiUrl}/queues/`);
+        const data = await response.json();
+        setTerminals(data);
+      } catch (error) {
+        console.error("Error fetching terminals:", error);
+      }
+    };
+    fetchTerminals();
+  }, []);
 
   const handleJoinQueue = async (terminalId) => {
-  try {
-    const token = await AsyncStorage.getItem("firebaseIdToken");
-    if (!token) {
-      Alert.alert("Error", "You must be logged in to join a queue.");
-      return;
-    }
-
-    const joinResponse = await fetch(`${apiUrl}/queues/${terminalId}/join`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    const joinData = await joinResponse.json();
-
-    if (joinData?.detail === "User already in queue") {
-      console.warn("⚠️ User already in queue");
-
-      const savedQueueId = await AsyncStorage.getItem("currentQueueId");
-      if (!savedQueueId) {
-        console.log("💾 Saving currentQueueId since it was missing...");
-        await AsyncStorage.setItem("currentQueueId", terminalId.toString());
-      }
-
-      const updatedQueueId = await AsyncStorage.getItem("currentQueueId");
-     
-      const savedId = updatedQueueId?.toString();
-      const currentId = terminalId?.toString();
-
-      if (savedId && savedId === currentId) {
-        console.log("✅ Same queue detected — redirecting to QR...");
-        router.push({
-          pathname: "/qr",
-          params: { queueId: savedId },
-        });
+    try {
+      const token = await AsyncStorage.getItem("firebaseIdToken");
+      if (!token) {
+        Alert.alert("Error", "You must be logged in to join a queue.");
         return;
       }
 
-      Alert.alert(
-        "Already in a queue",
-        "Please leave your current queue first before joining another."
-      );
-      return;
+      // Find the terminal info from terminals state
+      const terminal = terminals.find((t) => t.id === terminalId);
+
+      const joinResponse = await fetch(`${apiUrl}/queues/${terminalId}/join`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const joinData = await joinResponse.json();
+
+      if (joinData?.detail === "User already in queue") {
+        console.warn("⚠️ User already in queue");
+
+        const savedQueueId = await AsyncStorage.getItem("currentQueueId");
+        if (!savedQueueId) {
+          console.log("💾 Saving currentQueueId since it was missing...");
+          await AsyncStorage.setItem("currentQueueId", terminalId.toString());
+        }
+
+        const updatedQueueId = await AsyncStorage.getItem("currentQueueId");
+
+        const savedId = updatedQueueId?.toString();
+        const currentId = terminalId?.toString();
+
+        if (savedId && savedId === currentId) {
+          console.log("✅ Same queue detected — redirecting to QR...");
+          router.push({
+            pathname: "/qr",
+            params: {
+              queueId: savedId,
+              destination: terminal?.destination || "Unknown",
+              busId: terminal?.bus_id || "N/A",
+              terminalStatus: terminal?.status || "N/A",
+            },
+          });
+          return;
+        }
+
+        Alert.alert(
+          "Already in a queue",
+          "Please leave your current queue first before joining another."
+        );
+        return;
+      }
+
+      if (!joinResponse.ok) {
+        Alert.alert("Error", joinData?.detail || "Failed to join queue");
+        return;
+      }
+
+      await AsyncStorage.setItem("currentQueueId", terminalId.toString());
+      setCurrentQueueId(terminalId.toString());
+      console.log("✅ Joined queue successfully:", joinData);
+
+      router.replace({
+        pathname: "/qr",
+        params: {
+          queueId: terminalId,
+          destination: terminal?.destination || "Unknown",
+          busId: terminal?.bus_id || "N/A",
+          terminalStatus: terminal?.status || "N/A",
+        },
+      });
+    } catch (error) {
+      console.error("Error joining queue:", error);
+      Alert.alert("Error", "Something went wrong");
     }
-
-    if (!joinResponse.ok) {
-      Alert.alert("Error", joinData?.detail || "Failed to join queue");
-      return;
-    }
-
-    await AsyncStorage.setItem("currentQueueId", terminalId.toString());
-    setCurrentQueueId(terminalId.toString());
-    console.log("✅ Joined queue successfully:", joinData);
-
-    router.replace({
-      pathname: "/qr",
-      params: { queueId: terminalId },
-    });
-  } catch (error) {
-    console.error("Error joining queue:", error);
-    Alert.alert("Error", "Something went wrong");
-  }
-};
+  };
 
   useEffect(() => {
-  const loadCurrentQueue = async () => {
-    const savedId = await AsyncStorage.getItem("currentQueueId");
-    if (savedId) setCurrentQueueId(savedId);
-  };
-  loadCurrentQueue();
-}, []);
+    const loadCurrentQueue = async () => {
+      const savedId = await AsyncStorage.getItem("currentQueueId");
+      if (savedId) setCurrentQueueId(savedId);
+    };
+    loadCurrentQueue();
+  }, []);
 
   const q = (searchQuery || "").trim().toLowerCase();
-  const filteredTerminals = q.length === 0
-  ? terminals
-  : terminals.filter(t =>
-      (t?.destination ?? "").toLowerCase().includes(q)
-    );
+  const filteredTerminals =
+    q.length === 0
+      ? terminals
+      : terminals.filter((t) => (t?.destination ?? "").toLowerCase().includes(q));
 
   return (
     <>
@@ -137,7 +149,6 @@ export default function Terminals() {
         showsVerticalScrollIndicator={true}
       >
         <View style={styles.container}>
-         
           <View style={styles.searchContainer}>
             <Ionicons
               name="search"
@@ -156,37 +167,31 @@ export default function Terminals() {
 
           <Text style={styles.heading}>Terminals</Text>
 
-        {filteredTerminals.map((terminal) => (
-  <Pressable
-    key={terminal.id}
-    onPress={() => handleJoinQueue(terminal.id)}
-  >
-    <View style={styles.imageContainer}>
-      <Image
-        source={require("../assets/images/location.png")}
-        style={styles.image}
-        resizeMode="contain"
-      />
-      <View style={styles.textContainer}>
-        <Text style={styles.title}>{terminal.destination}</Text>
+          {filteredTerminals.map((terminal) => (
+            <Pressable key={terminal.id} onPress={() => handleJoinQueue(terminal.id)}>
+              <View style={styles.imageContainer}>
+                <Image
+                  source={require("../assets/images/location.png")}
+                  style={styles.image}
+                  resizeMode="contain"
+                />
+                <View style={styles.textContainer}>
+                  <Text style={styles.title}>{terminal.destination}</Text>
 
-        <Text
-          style={[
-            styles.subtitle,
-            currentQueueId === terminal.id.toString() && styles.inQueueText,
-          ]}
-        >
-          {currentQueueId === terminal.id.toString()
-            ? "In Queue"
-            : "Tap to join queue"}
-        </Text>
-      </View>
-    </View>
-  </Pressable>
-))}
-
-
-
+                  <Text
+                    style={[
+                      styles.subtitle,
+                      currentQueueId === terminal.id.toString() && styles.inQueueText,
+                    ]}
+                  >
+                    {currentQueueId === terminal.id.toString()
+                      ? "In Queue"
+                      : "Tap to join queue"}
+                  </Text>
+                </View>
+              </View>
+            </Pressable>
+          ))}
         </View>
       </ScrollView>
     </>
@@ -245,8 +250,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#A1A4B2",
   },
-inQueueText: {
-  color: "#59A96A",
-  fontWeight: "600",
-},
+  inQueueText: {
+    color: "#59A96A",
+    fontWeight: "600",
+  },
+  scrollContent: {
+    flexGrow: 1,
+  },
 });

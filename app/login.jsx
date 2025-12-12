@@ -6,6 +6,7 @@ import { Image, Pressable, Text, TextInput, View } from "react-native";
 import { auth } from "../firebaseConfig";
 import styles from "../src/styles/styles";
 import { setToken } from "../src/utils/authStorage";
+import { registerForPushNotificationsAsync, sendTokenToServer } from "../src/utils/pushNotifications";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -24,7 +25,16 @@ export default function Index() {
     const idToken = await getIdToken(user, true);
     await setToken(idToken);
 
-    router.replace("/accessModal");
+    try {
+      const token = await registerForPushNotificationsAsync();
+      if (token) {
+        await sendTokenToServer(token, idToken);
+      }
+    } catch (pushErr) {
+      console.log('Push registration failed', pushErr);
+    }
+
+    router.replace("/home");
   } catch (err) {
     setError(err.message);
   }

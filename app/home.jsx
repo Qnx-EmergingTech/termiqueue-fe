@@ -15,7 +15,7 @@ export default function Home() {
   const [isLoadingMap, setIsLoadingMap] = useState(true); 
   const [geofenceStatus, setGeofenceStatus] = useState(null);
   const [firstName, setFirstName] = useState("");
-  const [inRange, setInRange] = useState(true);
+  const [inRange, setInRange] = useState(false);
   const [menuVisible, setMenuVisible] = useState(false);
 
   const apiUrl = process.env.EXPO_PUBLIC_API_BASE_URL;
@@ -119,13 +119,13 @@ export default function Home() {
     }
   };
 
-  // useEffect(() => {
-  //   if (geofenceStatus?.can_join) {
-  //     setInRange(true);
-  //   } else {
-  //     setInRange(false);
-  //   }
-  // }, [geofenceStatus]);
+  useEffect(() => {
+    if (geofenceStatus?.can_join) {
+      setInRange(true);
+    } else {
+      setInRange(false);
+    }
+  }, [geofenceStatus]);
 
   const handleProceed = () => {
     if (!inRange) return;

@@ -4,7 +4,7 @@ import * as Location from 'expo-location';
 import { Stack, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, Alert, Pressable, Text, View } from "react-native";
-import MapView, { Marker } from 'react-native-maps';
+import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import { Menu, Provider as PaperProvider } from 'react-native-paper';
 import hstyles from "../src/styles/homeStyles";
 
@@ -12,9 +12,10 @@ export default function Home() {
   const router = useRouter();
   const [region, setRegion] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingMap, setIsLoadingMap] = useState(true); 
   const [geofenceStatus, setGeofenceStatus] = useState(null);
   const [firstName, setFirstName] = useState("");
-  const [inRange, setInRange] = useState(false);
+  const [inRange, setInRange] = useState(true);
   const [menuVisible, setMenuVisible] = useState(false);
 
   const apiUrl = process.env.EXPO_PUBLIC_API_BASE_URL;
@@ -28,47 +29,53 @@ export default function Home() {
     router.replace("/logoutModal");
   };
 
-   useEffect(() => {
-  const fetchProfile = async () => {
-    try {
-      const token = await AsyncStorage.getItem("firebaseIdToken");
-      if (!token) {
-        console.warn("No auth token found.");
-        return;
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const token = await AsyncStorage.getItem("firebaseIdToken");
+        if (!token) {
+          console.warn("No auth token found.");
+          return;
+        }
+
+        const response = await fetch(`${apiUrl}/profiles/me`, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!response.ok) {
+          console.error("Failed to fetch profile:", response.status);
+          return;
+        }
+
+        const data = await response.json();
+        console.log("Profile data:", data);
+        setFirstName(data.first_name);
+      } catch (error) {
+        console.error("Error fetching profile:", error);
       }
+    };
 
-      const response = await fetch(`${apiUrl}/profiles/me`, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) {
-        console.error("Failed to fetch profile:", response.status);
-        return;
-      }
-
-      const data = await response.json();
-      console.log("Profile data:", data);
-      setFirstName(data.first_name);
-    } catch (error) {
-      console.error("Error fetching profile:", error);
-    }
-  };
-
-  fetchProfile();
-}, []);
+    fetchProfile();
+  }, []);
 
   useEffect(() => {
     (async () => {
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        Alert.alert("Permission denied", "We need location access to continue.");
-        return;
-      }
+      try {
+        console.log('Requesting location permission...');
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== 'granted') {
+          Alert.alert("Permission denied", "We need location access to continue.");
+          setIsLoadingMap(false);
+          return;
+        }
 
-      const loc = await Location.getCurrentPositionAsync({});
+        console.log('Getting current location...');
+        const loc = await Location.getCurrentPositionAsync({});
+        console.log('Location obtained:', loc.coords);
+        
         const userRegion = {
           latitude: loc.coords.latitude,
           longitude: loc.coords.longitude,
@@ -76,23 +83,30 @@ export default function Home() {
           longitudeDelta: 0.01,
         };
 
+        console.log('Setting region:', userRegion);
         setRegion(userRegion);
-      checkGeofence(userRegion); 
+        setIsLoadingMap(false);
+        checkGeofence(userRegion);
+      } catch (error) {
+        console.error('Error getting location:', error);
+        setIsLoadingMap(false);
+        Alert.alert("Error", "Unable to get your location. Please try again.");
+      }
     })();
   }, []);
 
-      const checkGeofence = async (coords) => {
-        try {
-          setIsLoading(true);
+  const checkGeofence = async (coords) => {
+    try {
+      setIsLoading(true);
 
       const response = await fetch(`${apiUrl}/queues/check-geofence`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            lat: coords.latitude,
-            lon: coords.longitude,
-          }),
-        });
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          lat: coords.latitude,
+          lon: coords.longitude,
+        }),
+      });
 
       const data = await response.json();
       console.log("Geofence API response:", data);
@@ -105,14 +119,13 @@ export default function Home() {
     }
   };
 
-   useEffect(() => {
-  if (geofenceStatus?.can_join) {
-    setInRange(true);
-  } else {
-    setInRange(false);
-  }
-}, [geofenceStatus]);
-
+  // useEffect(() => {
+  //   if (geofenceStatus?.can_join) {
+  //     setInRange(true);
+  //   } else {
+  //     setInRange(false);
+  //   }
+  // }, [geofenceStatus]);
 
   const handleProceed = () => {
     if (!inRange) return;
@@ -121,11 +134,11 @@ export default function Home() {
   };
 
   return (
-  <PaperProvider>
-    <Stack.Screen options={{ headerShown: false }} />
+    <PaperProvider>
+      <Stack.Screen options={{ headerShown: false }} />
 
-    <View style={hstyles.container}>
-      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', marginBottom: 10 }}>
+      <View style={hstyles.container}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', marginBottom: 10 }}>
           <View style={{ flex: 1 }}>
             <Text style={hstyles.greeting}>Hello, {firstName}!</Text>
             <Text style={hstyles.title}>Ready to queue for your next ride?</Text>
@@ -135,8 +148,8 @@ export default function Home() {
             visible={menuVisible}
             onDismiss={closeMenu}
             contentStyle={{
-            backgroundColor: "white",
-            borderRadius: 5,
+              backgroundColor: "white",
+              borderRadius: 5,
             }}
             anchor={
               <Pressable onPress={openMenu} style={{ padding: 10 }}>
@@ -145,37 +158,49 @@ export default function Home() {
             }
           >
             <Menu.Item
-            onPress={handleLogout}
-            title="Logout"
-            leadingIcon={() => (
-              <Ionicons name="log-out-outline" size={24} color="#DB5461" />
-            )}
-            titleStyle={{
-              fontFamily: "Roboto_500Medium",
-              fontSize: 16,
-              color: "#333",
-            }}
-            style={{
-              paddingVertical: 10,
-              paddingHorizontal: 10,
-            }}
-          />
+              onPress={handleLogout}
+              title="Logout"
+              leadingIcon={() => (
+                <Ionicons name="log-out-outline" size={24} color="#DB5461" />
+              )}
+              titleStyle={{
+                fontFamily: "Roboto_500Medium",
+                fontSize: 16,
+                color: "#333",
+              }}
+              style={{
+                paddingVertical: 10,
+                paddingHorizontal: 10,
+              }}
+            />
           </Menu>
         </View>
-      
-      {region && (
-        <MapView
-          provider="google"
-          style={hstyles.map}
-          region={region}
-          showsUserLocation
-          showsMyLocationButton
-        >
-          <Marker coordinate={region} title="You are here" />
-        </MapView>
-      )}
-      
-      {isLoading ? (
+
+        {isLoadingMap ? (
+          <View style={[hstyles.map, { justifyContent: 'center', alignItems: 'center', backgroundColor: '#f0f0f0' }]}>
+            <ActivityIndicator size="large" color="#096B72" />
+            <Text style={{ marginTop: 10, color: '#666' }}>Loading map...</Text>
+          </View>
+        ) : region ? (
+          <MapView
+            provider={PROVIDER_GOOGLE}
+            style={hstyles.map}
+            initialRegion={region} 
+            showsUserLocation
+            showsMyLocationButton
+            onMapReady={() => console.log('✅ Map is ready')}
+            onError={(error) => console.log('❌ Map error:', error)}
+            onMapLoaded={() => console.log('✅ Map loaded successfully')}
+          >
+            <Marker coordinate={region} title="You are here" />
+          </MapView>
+        ) : (
+          <View style={[hstyles.map, { justifyContent: 'center', alignItems: 'center', backgroundColor: '#f0f0f0' }]}>
+            <Text style={{ color: '#666' }}>Unable to load map</Text>
+          </View>
+        )}
+
+        {isLoading ? (
           <ActivityIndicator size="large" color="#096B72" style={{ marginTop: 10 }} />
         ) : (
           <>
@@ -188,40 +213,39 @@ export default function Home() {
               <>
                 <Text style={hstyles.out}>Out of range!</Text>
                 <Text style={hstyles.outtext}>
-                   You are currently out of range, please go near the One Ayala terminal.
+                  You are currently out of range, please go near the One Ayala terminal.
                 </Text>
               </>
             )}
           </>
         )}
-    
-      <View style={hstyles.try}>
-  <Pressable
-    onPress={handleProceed}
-    disabled={!inRange}
-    style={[
-      hstyles.proceedButton,
-      { backgroundColor: inRange ? "#333242" : "#8C8C8C" }, 
-    ]}
-  >
-    <View style={hstyles.textContainer}>
-      <Text style={hstyles.btitle}>
-        {inRange ? "No terminal selected yet" : "No terminal selected yet"}
-      </Text>
-      <Text style={hstyles.stitle}>
-        {inRange ? "Please select a terminal" : "Please select a terminal"}
-      </Text>
-    </View>
-    <Ionicons
-      name="chevron-forward"
-      size={24}
-      color="white"
-      style={hstyles.icon}
-    />
-  </Pressable>
-</View>
 
-    </View>
-  </PaperProvider>
+        <View style={hstyles.try}>
+          <Pressable
+            onPress={handleProceed}
+            disabled={!inRange}
+            style={[
+              hstyles.proceedButton,
+              { backgroundColor: inRange ? "#333242" : "#8C8C8C" },
+            ]}
+          >
+            <View style={hstyles.textContainer}>
+              <Text style={hstyles.btitle}>
+                {inRange ? "No terminal selected yet" : "No terminal selected yet"}
+              </Text>
+              <Text style={hstyles.stitle}>
+                {inRange ? "Please select a terminal" : "Please select a terminal"}
+              </Text>
+            </View>
+            <Ionicons
+              name="chevron-forward"
+              size={24}
+              color="white"
+              style={hstyles.icon}
+            />
+          </Pressable>
+        </View>
+      </View>
+    </PaperProvider>
   );
 }

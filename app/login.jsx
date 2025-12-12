@@ -25,7 +25,6 @@ export default function Index() {
     const idToken = await getIdToken(user, true);
     await setToken(idToken);
 
-    // Register for push notifications after successful login
     try {
       const token = await registerForPushNotificationsAsync();
       if (token) {
@@ -33,10 +32,9 @@ export default function Index() {
       }
     } catch (pushErr) {
       console.log('Push registration failed', pushErr);
-      // Continue navigation even if push registration fails
     }
 
-    router.replace("/accessModal");
+    router.replace("/home");
   } catch (err) {
     setError(err.message);
   }

@@ -1,8 +1,8 @@
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Location from 'expo-location';
-import { Stack, useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import { Stack, useFocusEffect, useRouter } from "expo-router";
+import { useCallback, useEffect, useState } from "react";
 import { ActivityIndicator, Alert, Pressable, Text, View } from "react-native";
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import { Menu, Provider as PaperProvider } from 'react-native-paper';
@@ -18,6 +18,7 @@ export default function Home() {
   const [firstName, setFirstName] = useState("");
   const [inRange, setInRange] = useState(false);
   const [menuVisible, setMenuVisible] = useState(false);
+  const [currentQueue, setCurrentQueue] = useState(null); 
 
   const apiUrl = process.env.EXPO_PUBLIC_API_BASE_URL;
 
@@ -27,22 +28,71 @@ export default function Home() {
   const handleLogout = async () => {
     closeMenu();
     try {
-    await AsyncStorage.multiRemove([
-      "firebaseIdToken",
-      "userId",
-      "isLoggedIn",
-      "currentQueueId" 
-    ]);
-    
-    console.log('✅ Auth cleared from AsyncStorage');
-    
-    await auth.signOut();
-    
-    router.replace("/login");
-  } catch (error) {
-    console.error('Logout error:', error);
-  }
-};
+      await AsyncStorage.multiRemove([
+        "firebaseIdToken",
+        "userId",
+        "isLoggedIn",
+        "currentQueueId" 
+      ]);
+      
+      console.log('✅ Auth cleared from AsyncStorage');
+      
+      await auth.signOut();
+      
+      router.replace("/login");
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+  };
+
+  useFocusEffect(
+  useCallback(() => {
+    const fetchCurrentQueue = async () => {
+      try {
+        const token = await AsyncStorage.getItem("firebaseIdToken");
+        const queueId = await AsyncStorage.getItem("currentQueueId");
+
+        if (!token || !queueId) {
+          setCurrentQueue(null);
+          return;
+        }
+
+        const statusResponse = await fetch(
+          `${apiUrl}/queues/${queueId}/me/status`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+
+        if (statusResponse.status === 404) {
+          setCurrentQueue(null);
+          await AsyncStorage.removeItem("currentQueueId");
+          return;
+        }
+
+        if (!statusResponse.ok) return;
+
+        const statusData = await statusResponse.json();
+
+        const terminalsResponse = await fetch(`${apiUrl}/queues/`);
+        const terminals = await terminalsResponse.json();
+        const terminal = terminals.find(t => t.id === queueId);
+
+        setCurrentQueue({
+          queueId,
+          destination: terminal?.destination ?? "Unknown",
+          queueNumber: statusData.queue_number,
+          status: statusData.status,
+        });
+      } catch (e) {
+        console.error("Queue refresh failed:", e);
+      }
+    };
+
+    fetchCurrentQueue();
+  }, [])
+);
+
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -143,6 +193,17 @@ export default function Home() {
   }, [geofenceStatus]);
 
   const handleProceed = () => {
+    if (currentQueue) {
+      router.push({
+        pathname: '/qr',
+        params: {
+          queueId: currentQueue.queueId,
+          destination: currentQueue.destination,
+        },
+      });
+      return;
+    }
+
     if (!inRange) return;
     router.push('/terminal');
     console.log("Proceeding...");
@@ -238,19 +299,32 @@ export default function Home() {
         <View style={hstyles.try}>
           <Pressable
             onPress={handleProceed}
-            disabled={!inRange}
+            disabled={!currentQueue && !inRange} 
             style={[
               hstyles.proceedButton,
-              { backgroundColor: inRange ? "#333242" : "#8C8C8C" },
+              { backgroundColor: (currentQueue || inRange) ? "#333242" : "#8C8C8C" }, 
             ]}
           >
             <View style={hstyles.textContainer}>
-              <Text style={hstyles.btitle}>
-                {inRange ? "No terminal selected yet" : "No terminal selected yet"}
-              </Text>
-              <Text style={hstyles.stitle}>
-                {inRange ? "Please select a terminal" : "Please select a terminal"}
-              </Text>
+              {currentQueue !== null ? (
+                <>
+                  <Text style={hstyles.btitle}>
+                    {currentQueue.destination}
+                  </Text>
+                  <Text style={hstyles.stitle}>
+                    Queue #{currentQueue.queueNumber} • {currentQueue.status}
+                  </Text>
+                </>
+              ) : (
+                <>
+                  <Text style={hstyles.btitle}>
+                    No terminal selected yet
+                  </Text>
+                  <Text style={hstyles.stitle}>
+                    Please select a terminal
+                  </Text>
+                </>
+              )}
             </View>
             <Ionicons
               name="chevron-forward"

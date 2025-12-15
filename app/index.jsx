@@ -1,12 +1,47 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Link, Stack, useRouter } from "expo-router";
-import { Image, Pressable, Text, View } from "react-native";
+import { useEffect, useState } from "react";
+import { ActivityIndicator, Image, Pressable, Text, View } from "react-native";
 import styles from "../src/styles/styles";
 
 export default function Index() {
   const router = useRouter();
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        console.log('🔍 Checking authentication...');
+        const isLoggedIn = await AsyncStorage.getItem("isLoggedIn");
+        
+        if (isLoggedIn === "true") {
+          console.log('✅ User authenticated, redirecting to home');
+          router.replace('/home');
+        } else {
+          console.log('❌ User not authenticated, showing landing page');
+          setIsCheckingAuth(false); // Show landing page
+        }
+      } catch (error) {
+        console.error('Error checking auth:', error);
+        setIsCheckingAuth(false); // Show landing page on error
+      }
+    };
+
+    checkAuth();
+  }, []);
+
+  // Show loading spinner while checking auth
+  if (isCheckingAuth) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#fff' }}>
+        <ActivityIndicator size="large" color="#096B72" />
+      </View>
+    );
+  }
+
+  // Show landing page if not authenticated
   const handleSignup = () => {
-    router.push('/signup'); 
+    router.push('/signup');
   };
 
   return (
@@ -18,13 +53,16 @@ export default function Index() {
           <Image
             source={require('../assets/images/Frame.png')}
             style={styles.image}
-            resizeMode="cover" />
+            resizeMode="cover"
+          />
 
-          <Image source=
-            {require('../assets/images/Logo.png')}
+          <Image
+            source={require('../assets/images/Logo.png')}
             style={styles.logo}
-            resizeMode="cover" />
+            resizeMode="cover"
+          />
         </View>
+
         <View style={styles.textSection}>
           <View>
             <Text style={styles.mid}>Get in line without standing in one.</Text>

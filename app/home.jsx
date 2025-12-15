@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { ActivityIndicator, Alert, Pressable, Text, View } from "react-native";
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import { Menu, Provider as PaperProvider } from 'react-native-paper';
+import { auth } from "../firebaseConfig";
 import hstyles from "../src/styles/homeStyles";
 
 export default function Home() {
@@ -25,9 +26,23 @@ export default function Home() {
 
   const handleLogout = async () => {
     closeMenu();
-    await AsyncStorage.clear();
-    router.replace("/logoutModal");
-  };
+    try {
+    await AsyncStorage.multiRemove([
+      "firebaseIdToken",
+      "userId",
+      "isLoggedIn",
+      "currentQueueId" 
+    ]);
+    
+    console.log('✅ Auth cleared from AsyncStorage');
+    
+    await auth.signOut();
+    
+    router.replace("/login");
+  } catch (error) {
+    console.error('Logout error:', error);
+  }
+};
 
   useEffect(() => {
     const fetchProfile = async () => {

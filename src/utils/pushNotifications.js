@@ -1,5 +1,6 @@
 import messaging from '@react-native-firebase/messaging';
 import * as Device from 'expo-device';
+import { Alert } from 'react-native';
 
 // Request notification permissions and get FCM token
 export async function registerForPushNotificationsAsync() {
@@ -10,8 +11,6 @@ export async function registerForPushNotificationsAsync() {
     }
 
     console.log('Requesting notification permission...');
-
-    // Request permission (iOS and Android 13+)
     const authStatus = await messaging().requestPermission();
     const enabled =
       authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
@@ -23,30 +22,22 @@ export async function registerForPushNotificationsAsync() {
     }
 
     console.log('Permission granted, getting FCM token...');
-
-    // Get FCM token
     const token = await messaging().getToken();
     console.log('FCM Token received:', token ? 'Yes' : 'No');
 
     return token;
   } catch (error) {
-    console.log('registerForPushNotificationsAsync error:', error);
+    console.error('Registration error:', error);
     return null;
   }
 }
 
-// Send token to your backend
+// Send token to backend
 export async function sendTokenToServer(token, userId) {
-  if (!token) {
-    console.log('No token to send');
-    return null;
-  }
+  if (!token) return null;
 
   try {
     const BACKEND_URL = 'http://44.202.107.196:8080/profiles/register-fcm';
-
-    console.log('Sending FCM token to server...');
-    
     const res = await fetch(BACKEND_URL, {
       method: 'POST',
       headers: {
@@ -57,24 +48,68 @@ export async function sendTokenToServer(token, userId) {
     });
 
     if (!res.ok) {
-      const errorText = await res.text();
-      console.log('Failed to send token to server:', errorText);
+      console.error('Failed to send token');
       return null;
     }
 
-    const result = await res.json();
-    console.log('Token successfully sent to server');
-    return result;
+    console.log('✅ Token sent successfully');
+    return await res.json();
   } catch (err) {
-    console.log('sendTokenToServer error:', err);
+    console.error('sendTokenToServer error:', err);
     return null;
   }
 }
 
-// Listen for token refresh (optional but recommended)
+// Foreground ONLY: Show alert when app is open
+export function setupForegroundNotificationHandler() {
+  console.log('🔔 Setting up foreground handler...');
+  
+  return messaging().onMessage(async (remoteMessage) => {
+    console.log('📬 [FOREGROUND] Notification:', remoteMessage.notification?.title);
+   
+    Alert.alert(
+      remoteMessage.notification?.title || 'Notification',
+      remoteMessage.notification?.body || '',
+      [{ text: 'OK' }]
+    );
+  });
+}
+
+// Background ONLY: Runs when app is background/quit
+export function setupBackgroundNotificationHandler() {
+  console.log('🔔 Setting up background handler...');
+  
+  messaging().setBackgroundMessageHandler(async (remoteMessage) => {
+    console.log('📬 [BACKGROUND] Message:', remoteMessage.notification?.title);
+    // Return immediately - let Android display notification
+    return Promise.resolve();
+  });
+}
+
+// Handle notification taps
+export function setupNotificationOpenHandler(callback) {
+  console.log('🔔 Setting up tap handlers...');
+  
+  // App in background - user taps notification
+  messaging().onNotificationOpenedApp((remoteMessage) => {
+    console.log('📬 [TAP-BACKGROUND] Notification tapped');
+    if (callback) callback(remoteMessage);
+  });
+
+  // App was quit - user taps notification
+  messaging().getInitialNotification().then((remoteMessage) => {
+    if (remoteMessage) {
+      console.log('📬 [TAP-QUIT] App opened from notification');
+      if (callback) callback(remoteMessage);
+    }
+  });
+}
+
+// Token refresh
 export function onTokenRefresh(callback) {
-  return messaging().onTokenRefresh(token => {
-    console.log('FCM token refreshed:', token);
+  console.log('🔔 Setting up token refresh listener...');
+  return messaging().onTokenRefresh((token) => {
+    console.log('🔄 Token refreshed');
     callback(token);
   });
 }
@@ -82,5 +117,8 @@ export function onTokenRefresh(callback) {
 export default {
   registerForPushNotificationsAsync,
   sendTokenToServer,
+  setupForegroundNotificationHandler,
+  setupBackgroundNotificationHandler,
+  setupNotificationOpenHandler,
   onTokenRefresh,
 };

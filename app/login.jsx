@@ -1,3 +1,4 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Link, Stack, useRouter } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { getIdToken, signInWithEmailAndPassword } from "firebase/auth";
@@ -10,7 +11,7 @@ import { registerForPushNotificationsAsync, sendTokenToServer } from "../src/uti
 
 SplashScreen.preventAutoHideAsync();
 
-export default function Index() {
+export default function Login() {
   const router = useRouter();
   const [appIsReady, setAppIsReady] = useState(false);
   const [email, setEmail] = useState("");
@@ -18,27 +19,35 @@ export default function Index() {
   const [error, setError] = useState("");
 
   const handleLogin = async () => {
-  try {
-    const userCredential = await signInWithEmailAndPassword(auth, email, password);
-    const user = userCredential.user;
-
-    const idToken = await getIdToken(user, true);
-    await setToken(idToken);
-
     try {
-      const token = await registerForPushNotificationsAsync();
-      if (token) {
-        await sendTokenToServer(token, idToken);
-      }
-    } catch (pushErr) {
-      console.log('Push registration failed', pushErr);
-    }
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
 
-    router.replace("/home");
-  } catch (err) {
-    setError(err.message);
-  }
-};
+      const idToken = await getIdToken(user, true);
+      await setToken(idToken);
+
+      // ✅ Save auth state to AsyncStorage
+      await AsyncStorage.setItem("firebaseIdToken", idToken);
+      await AsyncStorage.setItem("userId", user.uid);
+      await AsyncStorage.setItem("isLoggedIn", "true");
+      
+      console.log('✅ Auth saved to AsyncStorage');
+
+      // Register for push notifications
+      try {
+        const token = await registerForPushNotificationsAsync();
+        if (token) {
+          await sendTokenToServer(token, idToken);
+        }
+      } catch (pushErr) {
+        console.log('Push registration failed', pushErr);
+      }
+
+      router.replace("/home");
+    } catch (err) {
+      setError(err.message);
+    }
+  };
 
   const handleFacebook = () => {
     console.log("Signup pressed");
@@ -52,33 +61,33 @@ export default function Index() {
     <>
       <Stack.Screen
         options={{
-          headerShown: true,           
-          headerTitle: '',              
-          headerTransparent: true,      
-          headerBackTitleVisible: false 
+          headerShown: true,
+          headerTitle: '',
+          headerTransparent: true,
+          headerBackTitleVisible: false
         }}
       />
 
       <View style={styles.container}>
         <View style={styles.imageContainer}>
-    <Image
-      source={require('../assets/images/Blob.png')}
-      style={styles.imageBg}
-      resizeMode="stretch"
-    />
+          <Image
+            source={require('../assets/images/Blob.png')}
+            style={styles.imageBg}
+            resizeMode="stretch"
+          />
 
-    <View style={styles.welcome}>
-      <Text style={styles.heading}>Welcome Back!</Text>
+          <View style={styles.welcome}>
+            <Text style={styles.heading}>Welcome Back!</Text>
 
-      <Pressable style={styles.fbButton} onPress={handleFacebook}>
-        <Text style={styles.loginText}>CONTINUE WITH FACEBOOK</Text>
-      </Pressable>
+            <Pressable style={styles.fbButton} onPress={handleFacebook}>
+              <Text style={styles.loginText}>CONTINUE WITH FACEBOOK</Text>
+            </Pressable>
 
-      <Pressable style={styles.gButton} onPress={handleGoogle}>
-        <Text style={styles.buttonText}>CONTINUE WITH GOOGLE</Text>
-      </Pressable>
-    </View>
-  </View>
+            <Pressable style={styles.gButton} onPress={handleGoogle}>
+              <Text style={styles.buttonText}>CONTINUE WITH GOOGLE</Text>
+            </Pressable>
+          </View>
+        </View>
 
         <View style={styles.field}>
           <TextInput
@@ -105,9 +114,9 @@ export default function Index() {
         <Pressable style={styles.loginButton} onPress={handleLogin}>
           <Text style={styles.loginText}>LOG IN</Text>
         </Pressable>
-        
+
         <View style={styles.field}>
-          <Text  style={styles.fp}>Forgot Password?</Text>
+          <Text style={styles.fp}>Forgot Password?</Text>
         </View>
 
         <View style={styles.bottom}>

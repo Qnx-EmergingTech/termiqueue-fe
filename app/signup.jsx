@@ -7,9 +7,8 @@ import { auth } from "../firebaseConfig";
 import styles from "../src/styles/styles";
 import { setToken } from "../src/utils/authStorage";
 
-export default function Index() {
+export default function Signup() {
   const router = useRouter();
-  const [appIsReady, setAppIsReady] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -40,10 +39,10 @@ export default function Index() {
       const userCred = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCred.user;
 
-      const idToken = await getIdToken(user, true);
+      const idToken = await getIdToken(user);
       await setToken(idToken);
       
-      const res = await fetch(`${apiUrl}/profiles/`, {
+      const res = await fetch(`${apiUrl}/profiles/signup`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -51,21 +50,25 @@ export default function Index() {
         },
         body: JSON.stringify({
           username: username.trim(),
-          email: email.trim(),
         }),
       });
 
       if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.detail || "Failed to create profile");
-      }
+    const data = await res.json();
+    console.log("Backend error response:", data); 
+    throw new Error(
+      typeof data.detail === "string"
+        ? data.detail
+        : JSON.stringify(data.detail)
+    );
+  }
 
-      Alert.alert("Success", "Account created!");
-      router.replace("/kyc");
-    } catch (err) {
-      console.error(err);
-      setError(err.message || "Something went wrong.");
-    }
+  Alert.alert("Success", "Account created!");
+  router.replace("/kyc");
+} catch (err) {
+  console.error("Signup error:", err);
+  setError(err.message || JSON.stringify(err));
+}
   };
 
   return (

@@ -1,4 +1,5 @@
 // app/_layout.tsx
+
 import {
   Inter_400Regular,
   Inter_600SemiBold,
@@ -14,15 +15,17 @@ import {
   RobotoMono_500Medium,
   RobotoMono_700Bold,
 } from "@expo-google-fonts/roboto-mono";
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useFonts } from "expo-font";
-import { Stack, useRouter } from "expo-router";
-import * as SplashScreen from "expo-splash-screen";
-import SafeScreen from "../components/SafeScreen";
 
-import { getIdToken } from "firebase/auth";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useFonts } from "expo-font";
+import { Stack, router } from "expo-router";
+import * as SplashScreen from "expo-splash-screen";
 import { useCallback, useEffect, useState } from "react";
+
+import SafeScreen from "../components/SafeScreen";
 import { auth } from "../firebaseConfig";
+import { getIdToken } from "firebase/auth";
+
 import {
   onTokenRefresh,
   sendTokenToServer,
@@ -34,30 +37,22 @@ import {
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-  const router = useRouter();
-  const [isAuthenticated, setIsAuthenticated] = useState(null); // null = checking
+  const [isAuthenticated, setIsAuthenticated] = useState(null);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
-  // Check auth state on mount
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        console.log('🔍 Checking authentication...');
-        
         const isLoggedIn = await AsyncStorage.getItem("isLoggedIn");
         const token = await AsyncStorage.getItem("firebaseIdToken");
-        
-        console.log('Auth check:', { isLoggedIn, hasToken: !!token });
-        
+
         if (isLoggedIn === "true" && token) {
-          console.log('✅ User is authenticated');
           setIsAuthenticated(true);
         } else {
-          console.log('❌ User is not authenticated');
           setIsAuthenticated(false);
         }
-      } catch (error) {
-        console.error('Error checking auth:', error);
+      } catch (err) {
+        console.log("Auth check failed:", err);
         setIsAuthenticated(false);
       } finally {
         setIsCheckingAuth(false);
@@ -67,61 +62,47 @@ export default function RootLayout() {
     checkAuth();
   }, []);
 
-  // Set up notification handlers
   useEffect(() => {
-    if (!isAuthenticated) return; // Only set up if authenticated
-
-    console.log('🔔 Setting up notifications...');
+    if (!isAuthenticated) return;
 
     setupBackgroundNotificationHandler();
+
     const unsubscribeForeground = setupForegroundNotificationHandler();
 
-    setupNotificationOpenHandler((remoteMessage) => {
-      console.log('📬 User tapped notification:', remoteMessage);
-      
-      const data = remoteMessage.data || {};
-      
-      // Add a small delay to ensure auth is loaded
-      setTimeout(async () => {
-        const isLoggedIn = await AsyncStorage.getItem("isLoggedIn");
-        
-        if (isLoggedIn !== "true") {
-          console.log('⚠️ User not authenticated, redirecting to login');
-          router.replace('/login');
-          return;
-        }
+    setupNotificationOpenHandler(async (remoteMessage) => {
+      const data = remoteMessage?.data || {};
 
-        if (data.queueId) {
-          console.log('🔄 Navigating to QR page...');
-          router.push({
-            pathname: '/home',
-            params: {
-              queueId: data.queueId,
-              destination: data.destination || 'Unknown',
-              busId: data.busId || 'N/A',
-              terminalStatus: data.terminalStatus || 'N/A',
-            },
-          });
-        } else if (data.screen) {
-          router.push(data.screen);
-        }
-      }, 500);
+      const isLoggedIn = await AsyncStorage.getItem("isLoggedIn");
+      if (isLoggedIn !== "true") {
+        router.replace("/login");
+        return;
+      }
+
+      if (data.queueId) {
+        router.push({
+          pathname: "/home",
+          params: {
+            queueId: data.queueId,
+            destination: data.destination,
+            busId: data.busId,
+          },
+        });
+      }
     });
 
-    const unsubscribeTokenRefresh = onTokenRefresh(async (newToken) => {
+    const unsubscribeTokenRefresh = onTokenRefresh(async (newFcmToken) => {
       const user = auth.currentUser;
-      if (user && newToken) {
-        console.log('🔄 Updating refreshed token on server');
-        const idToken = await getIdToken(user, true);
-        await sendTokenToServer(newToken, idToken);
-      }
+      if (!user || !newFcmToken) return;
+
+      const idToken = await getIdToken(user, true);
+      await sendTokenToServer(newFcmToken, idToken);
     });
 
     return () => {
       unsubscribeForeground();
       unsubscribeTokenRefresh();
     };
-  }, [router, isAuthenticated]);
+  }, [isAuthenticated]);
 
   const [fontsLoaded] = useFonts({
     Inter_400Regular,
@@ -141,7 +122,13 @@ export default function RootLayout() {
     }
   }, [fontsLoaded, isCheckingAuth]);
 
-  if (!fontsLoaded || isCheckingAuth) return null;
+  if (!fontsLoaded || isCheckingAuth) {
+    return (
+      <SafeScreen onLayout={onLayoutRootView}>
+        <Stack />
+      </SafeScreen>
+    );
+  }
 
   return (
     <SafeScreen onLayout={onLayoutRootView}>

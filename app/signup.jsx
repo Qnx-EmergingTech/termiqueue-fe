@@ -54,13 +54,10 @@ export default function Signup() {
       });
 
       if (!res.ok) {
-    const data = await res.json();
-    console.log("Backend error response:", data); 
-    throw new Error(
-      typeof data.detail === "string"
-        ? data.detail
-        : JSON.stringify(data.detail)
-    );
+        const data = await res.json();
+        console.log("Backend error response:", data); 
+        await user.delete();
+        throw new Error(data.detail || "Failed to create profile");
   }
 
   Alert.alert("Success", "Account created!");

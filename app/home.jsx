@@ -3,7 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Location from 'expo-location';
 import { Stack, useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
-import { ActivityIndicator, Alert, Pressable, Text, View } from "react-native";
+import { ActivityIndicator, Alert, Pressable, Text, View, ScrollView, RefreshControl } from "react-native";
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import { Menu, Provider as PaperProvider } from 'react-native-paper';
 import { auth } from "../firebaseConfig";
@@ -19,6 +19,7 @@ export default function Home() {
   const [inRange, setInRange] = useState(false);
   const [menuVisible, setMenuVisible] = useState(false);
   const [currentQueue, setCurrentQueue] = useState(null); 
+  const [refreshing, setRefreshing] = useState(false);
 
   const apiUrl = process.env.EXPO_PUBLIC_API_BASE_URL;
 
@@ -45,151 +46,107 @@ export default function Home() {
     }
   };
 
-  useFocusEffect(
-  useCallback(() => {
-    const fetchCurrentQueue = async () => {
-      try {
-        const token = await AsyncStorage.getItem("firebaseIdToken");
-        const queueId = await AsyncStorage.getItem("currentQueueId");
-
-        if (!token || !queueId) {
-          setCurrentQueue(null);
-          return;
-        }
-
-        const statusResponse = await fetch(
-          `${apiUrl}/queues/${queueId}/me/status`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-
-        if (statusResponse.status === 404) {
-          setCurrentQueue(null);
-          await AsyncStorage.removeItem("currentQueueId");
-          return;
-        }
-
-        if (!statusResponse.ok) return;
-
-        const statusData = await statusResponse.json();
-
-        const terminalsResponse = await fetch(`${apiUrl}/queues/`);
-        const terminals = await terminalsResponse.json();
-        const terminal = terminals.find(t => t.id === queueId);
-
-        setCurrentQueue({
-          queueId,
-          destination: terminal?.destination ?? "Unknown",
-          queueNumber: statusData.queue_number,
-          status: statusData.status,
-        });
-      } catch (e) {
-        console.error("Queue refresh failed:", e);
-      }
-    };
-
-    fetchCurrentQueue();
-  }, [])
-);
-
-
-  useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const token = await AsyncStorage.getItem("firebaseIdToken");
-        if (!token) {
-          console.warn("No auth token found.");
-          return;
-        }
-
-        const response = await fetch(`${apiUrl}/profiles/me`, {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (!response.ok) {
-          console.error("Failed to fetch profile:", response.status);
-          return;
-        }
-
-        const data = await response.json();
-        console.log("Profile data:", data);
-        setFirstName(data.first_name);
-      } catch (error) {
-        console.error("Error fetching profile:", error);
-      }
-    };
-
-    fetchProfile();
-  }, []);
-
-  useEffect(() => {
-    (async () => {
-      try {
-        console.log('Requesting location permission...');
-        const { status } = await Location.requestForegroundPermissionsAsync();
-        if (status !== 'granted') {
-          Alert.alert("Permission denied", "We need location access to continue.");
-          setIsLoadingMap(false);
-          return;
-        }
-
-        console.log('Getting current location...');
-        const loc = await Location.getCurrentPositionAsync({});
-        console.log('Location obtained:', loc.coords);
-        
-        const userRegion = {
-          latitude: loc.coords.latitude,
-          longitude: loc.coords.longitude,
-          latitudeDelta: 0.01,
-          longitudeDelta: 0.01,
-        };
-
-        console.log('Setting region:', userRegion);
-        setRegion(userRegion);
-        setIsLoadingMap(false);
-        checkGeofence(userRegion);
-      } catch (error) {
-        console.error('Error getting location:', error);
-        setIsLoadingMap(false);
-        Alert.alert("Error", "Unable to get your location. Please try again.");
-      }
-    })();
-  }, []);
-
-  const checkGeofence = async (coords) => {
+  const fetchProfile = async () => {
     try {
-      setIsLoading(true);
+      const token = await AsyncStorage.getItem("firebaseIdToken");
+      if (!token) return;
+      const response = await fetch(`${apiUrl}/profiles/me`, {
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      });
+      if (!response.ok) return;
+      const data = await response.json();
+      setFirstName(data.first_name);
+    } catch (error) {
+      console.error("Error fetching profile:", error);
+    }
+  };
 
-      const response = await fetch(`${apiUrl}/queues/check-geofence`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          lat: coords.latitude,
-          lon: coords.longitude,
-        }),
+  const fetchCurrentQueue = async () => {
+    try {
+      const token = await AsyncStorage.getItem("firebaseIdToken");
+      const queueId = await AsyncStorage.getItem("currentQueueId");
+
+      if (!token || !queueId) {
+        setCurrentQueue(null);
+        return;
+      }
+
+      const statusResponse = await fetch(`${apiUrl}/queues/${queueId}/me/status`, {
+        headers: { Authorization: `Bearer ${token}` },
       });
 
-      const data = await response.json();
-      console.log("Geofence API response:", data);
-      setGeofenceStatus(data);
+      if (statusResponse.status === 404) {
+        setCurrentQueue(null);
+        await AsyncStorage.removeItem("currentQueueId");
+        return;
+      }
+
+      if (!statusResponse.ok) return;
+
+      const statusData = await statusResponse.json();
+      const terminalsResponse = await fetch(`${apiUrl}/queues/`);
+      const terminals = await terminalsResponse.json();
+      const terminal = terminals.find(t => t.id === queueId);
+
+      setCurrentQueue({
+        queueId,
+        destination: terminal?.destination ?? "Unknown",
+        queueNumber: statusData.queue_number,
+        status: statusData.status,
+      });
+    } catch (e) {
+      console.error("Queue fetch failed:", e);
+    }
+  };
+
+  const fetchLocationAndGeofence = async () => {
+    try {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert("Permission denied", "We need location access to continue.");
+        setIsLoadingMap(false);
+        return;
+      }
+
+      const loc = await Location.getCurrentPositionAsync({});
+      const userRegion = {
+        latitude: loc.coords.latitude,
+        longitude: loc.coords.longitude,
+        latitudeDelta: 0.01,
+        longitudeDelta: 0.01,
+      };
+      setRegion(userRegion);
+      setIsLoadingMap(false);
+
+      setIsLoading(true);
+      const geofenceRes = await fetch(`${apiUrl}/queues/check-geofence`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ lat: userRegion.latitude, lon: userRegion.longitude }),
+      });
+      const geofenceData = await geofenceRes.json();
+      setGeofenceStatus(geofenceData);
     } catch (error) {
-      console.error("Error checking geofence:", error);
-      Alert.alert("Error", "Unable to reach server. Please try again later.");
+      console.error("Error getting location or geofence:", error);
+      setIsLoadingMap(false);
+      setIsLoading(false);
+      Alert.alert("Error", "Unable to get your location or geofence.");
     } finally {
       setIsLoading(false);
     }
   };
 
   useEffect(() => {
-    if (geofenceStatus?.can_join) {
-      setInRange(true);
-    } else {
-      setInRange(false);
-    }
+    fetchProfile();
+    fetchLocationAndGeofence();
+  }, []);
+
+  useFocusEffect(useCallback(() => {
+    fetchCurrentQueue();
+  }, []));
+
+  useEffect(() => {
+    setInRange(geofenceStatus?.can_join ?? false);
   }, [geofenceStatus]);
 
   const handleProceed = () => {
@@ -206,12 +163,25 @@ export default function Home() {
 
     if (!inRange) return;
     router.push('/terminal');
-    console.log("Proceeding...");
+  };
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await fetchProfile();
+    await fetchCurrentQueue();
+    await fetchLocationAndGeofence();
+    setRefreshing(false);
   };
 
   return (
     <PaperProvider>
       <Stack.Screen options={{ headerShown: false }} />
+
+       <ScrollView
+        contentContainerStyle={{ flexGrow: 1 }}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+        }>
 
       <View style={hstyles.container}>
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', marginBottom: 10 }}>
@@ -335,6 +305,7 @@ export default function Home() {
           </Pressable>
         </View>
       </View>
+      </ScrollView>
     </PaperProvider>
   );
 }

@@ -17,35 +17,58 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [username, setUsername] = useState("");
+
+  const apiUrl = process.env.EXPO_PUBLIC_API_BASE_URL;
 
   const handleLogin = async () => {
+    setError("");
+    if (!username.trim() || !password) {
+      setError("Username and password are required.");
+      return;
+    }
+
     try {
+      const res = await fetch(`${apiUrl}/profiles/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username: username.trim(), password }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.detail || "Invalid username or password");
+      }
+
+      const data = await res.json();
+      const email = data.email;
+
+      if (!email) throw new Error("Email not found for this username");
+
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
-
       const idToken = await getIdToken(user, true);
-      await setToken(idToken);
 
-      // ✅ Save auth state to AsyncStorage
+      await setToken(idToken);
       await AsyncStorage.setItem("firebaseIdToken", idToken);
       await AsyncStorage.setItem("userId", user.uid);
       await AsyncStorage.setItem("isLoggedIn", "true");
-      
-      console.log('✅ Auth saved to AsyncStorage');
 
-      // Register for push notifications
+      console.log("✅ Auth saved to AsyncStorage");
+
       try {
         const token = await registerForPushNotificationsAsync();
         if (token) {
           await sendTokenToServer(token, idToken);
         }
       } catch (pushErr) {
-        console.log('Push registration failed', pushErr);
+        console.log("Push registration failed", pushErr);
       }
 
       router.replace("/home");
     } catch (err) {
-      setError(err.message);
+      console.log(err);
+      setError(err.message || "Login failed");
     }
   };
 
@@ -92,10 +115,10 @@ export default function Login() {
         <View style={styles.field}>
           <TextInput
             style={styles.input}
-            placeholder="Enter your email"
+            placeholder="Username"
             autoCapitalize="none"
-            value={email}
-            onChangeText={setEmail}
+            value={username}
+            onChangeText={setUsername}
           />
         </View>
 

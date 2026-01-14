@@ -7,14 +7,16 @@ import { auth } from "../firebaseConfig";
 import styles from "../src/styles/styles";
 import { setToken } from "../src/utils/authStorage";
 
-export default function Index() {
+export default function Signup() {
   const router = useRouter();
-  const [appIsReady, setAppIsReady] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [accepted, setAccepted] = useState(false);
+  const [username, setUsername] = useState("");
+
+  const apiUrl = process.env.EXPO_PUBLIC_API_BASE_URL;
 
   const handleFacebook = () => {
     router.push('/home');
@@ -27,43 +29,43 @@ export default function Index() {
   const handleProceed = async () => {
     setError("");
 
-    if (!accepted) {
-      setError("Please accept the privacy policy.");
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      setError("Passwords do not match.");
-      return;
-    }
-
-    try {
+     if (!username.trim()) return setError("Username is required.");
+     if (!email.trim()) return setError("Email is required.");
+     if (!password || !confirmPassword) return setError("Password is required.");
+     if (password !== confirmPassword) return setError("Passwords do not match.");
+     if (!accepted) return setError("Please accept the privacy policy.");
+    
+     try {
       const userCred = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCred.user;
 
-      const idToken = await getIdToken(user, true);
+      const idToken = await getIdToken(user);
       await setToken(idToken);
       
-      console.log("User created:", user.email);
-      Alert.alert("Success", "Your account has been created!");
-      router.replace("/kyc");
-    } catch (err) {
-      let msg;
-    switch (err.code) {
-      case "auth/email-already-in-use":
-        msg = "This email is already registered. Try logging in instead.";
-        break;
-      case "auth/invalid-email":
-        msg = "Please enter a valid email address.";
-        break;
-      case "auth/weak-password":
-        msg = "Password must be at least 6 characters.";
-        break;
-      default:
-        msg = "Something went wrong. Please try again.";
-    }
-    setError(msg);
-    }
+      const res = await fetch(`${apiUrl}/profiles/signup`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${idToken}`,
+        },
+        body: JSON.stringify({
+          username: username.trim(),
+        }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        console.log("Backend error response:", data); 
+        await user.delete();
+        throw new Error(data.detail || "Failed to create profile");
+  }
+
+  Alert.alert("Success", "Account created!");
+  router.replace("/kyc");
+} catch (err) {
+  console.error("Signup error:", err);
+  setError(err.message || JSON.stringify(err));
+}
   };
 
   return (
@@ -99,6 +101,16 @@ export default function Index() {
   </View>
 
         <View style={styles.field}>
+          <TextInput
+            style={styles.input}
+            placeholder="Enter your username"
+            autoCapitalize="none"
+            value={username}
+            onChangeText={setUsername}
+          />
+        </View>
+
+         <View style={styles.field}>
           <TextInput
             style={styles.input}
             placeholder="Enter your email"

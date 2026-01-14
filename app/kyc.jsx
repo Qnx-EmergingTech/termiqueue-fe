@@ -23,7 +23,6 @@ export default function Index() {
   const [firstname, setFirstName] = useState("");
   const [middlename, setMiddleName] = useState("");
   const [lastname, setLastName] = useState("");
-  const [address, setAddress] = useState("");
   const [contact, setContact] = useState("");
   const [birthdate, setBirthdate] = useState("");
   const [error, setError] = useState("");
@@ -49,7 +48,6 @@ export default function Index() {
           middle_name: middlename || null,
           last_name: lastname,
           birthdate: birthdate,
-          address: address,
           is_privileged: false,
           in_queue: false,
         }),
@@ -174,15 +172,6 @@ export default function Index() {
                   />
                 </View>
               )}
-            </View>
-
-            <View style={styles.field}>
-              <TextInput
-                style={styles.input}
-                placeholder="Full address"
-                value={address}
-                onChangeText={setAddress}
-              />
             </View>
 
             <View style={styles.field}>

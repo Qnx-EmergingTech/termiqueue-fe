@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 
 
-export default function terminalModal() {
+export default function TerminalModal() {
   const router = useRouter();
   const [visible, setVisible] = useState(true);
 
@@ -53,7 +53,7 @@ export default function terminalModal() {
               />
               <Text style={styles.title}>Select terminal?</Text>
               <Text style={styles.text}>
-                This bus is already here, if you didn't make it, your queue prioritization would just go down but you will still be able to queue.
+                This bus is already here, if you didn`t make it, your queue prioritization would just go down but you will still be able to queue.
               </Text>
 
               <Pressable style={styles.button} onPress={handleConfirm}>

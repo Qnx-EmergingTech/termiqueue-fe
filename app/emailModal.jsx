@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 
 
-export default function accessModal() {
+export default function EmailModal() {
   const router = useRouter();
   const [visible, setVisible] = useState(true);
 

@@ -13,7 +13,7 @@ import {
   View
 } from 'react-native';
 
-export default function cancelModal() {
+export default function CancelModal() {
   const router = useRouter();
   const [visible, setVisible] = useState(true);
 

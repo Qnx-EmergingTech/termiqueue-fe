@@ -204,6 +204,25 @@ export default function Home() {
             }
           >
             <Menu.Item
+              onPress={() => {
+                closeMenu();
+                router.push("/trip-history");
+              }}
+              title="Trip History"
+              leadingIcon={() => (
+                <Ionicons name="time-outline" size={24} color="#333" />
+              )}
+              titleStyle={{
+                fontFamily: "Roboto_500Medium",
+                fontSize: 16,
+                color: "#333",
+              }}
+              style={{
+                paddingVertical: 10,
+                paddingHorizontal: 10,
+              }}
+            />
+            <Menu.Item
               onPress={handleLogout}
               title="Logout"
               leadingIcon={() => (

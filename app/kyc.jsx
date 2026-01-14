@@ -59,7 +59,7 @@ export default function Index() {
       }
 
       console.log("KYC submitted successfully");
-      router.push('/accessModal');
+      router.push('/login');
 
     } catch (e) {
       console.error(e);

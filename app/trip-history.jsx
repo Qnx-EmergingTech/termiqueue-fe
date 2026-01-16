@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Stack, useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import {
   Alert,
   Dimensions,
@@ -17,10 +17,94 @@ import {
 export default function TripHistory() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
-  //const [trips, setTrips] = useState([]);
+  const [trips, setTrips] = useState([]);
 
-  //const apiUrl = process.env.EXPO_PUBLIC_API_BASE_URL;
+  const apiUrl = process.env.EXPO_PUBLIC_API_BASE_URL;
 
+  const fetchTripHistory = async () => {
+    try {
+        const token = await AsyncStorage.getItem("firebaseIdToken");
+
+         if (!token) {
+            Alert.alert("Error", "User not authenticated");
+            return;
+        }
+
+        const response = await fetch(`${apiUrl}/profiles/me/trips/all`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const data = await response.json();
+
+        setTrips(Array.isArray(data?.trips) ? data.trips : []);
+    } catch (error) {
+        console.error("Error fetching trip history:", error);
+    }
+ };
+
+    useEffect(() => {
+        fetchTripHistory();
+    }, []);
+
+    const isToday = (date) => {
+    const today = new Date();
+    return date.toDateString() === today.toDateString();
+  };
+
+  const isYesterday = (date) => {
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    return date.toDateString() === yesterday.toDateString();
+  };
+
+  const formatDateHeading = (date) => {
+    if (isToday(date)) return "Today";
+    if (isYesterday(date)) return "Yesterday";
+    return date.toLocaleDateString("en-US", {
+      month: "long",
+      day: "numeric",
+      year: "numeric",
+    });
+  };
+
+  const formatTime = (dateString) => {
+    return new Date(dateString).toLocaleTimeString("en-US", {
+      hour: "numeric",
+      minute: "2-digit",
+    });
+  };
+
+    const groupedTrips = useMemo(() => {
+    const filtered = trips.filter((trip) =>
+      trip.destination.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
+    filtered.sort(
+      (a, b) => new Date(b.departed_at) - new Date(a.departed_at)
+    );
+
+    const groups = {};
+
+    filtered.forEach((trip) => {
+      const date = new Date(trip.departed_at);
+      const key = date.toDateString();
+
+      if (!groups[key]) {
+        groups[key] = [];
+      }
+
+      groups[key].push(trip);
+    });
+
+    return groups;
+  }, [trips, searchQuery]);
+
+    const sortedDates = Object.keys(groupedTrips).sort(
+    (a, b) => new Date(b) - new Date(a)
+  );
+    
   return (
     <>
       <Stack.Screen
@@ -57,191 +141,55 @@ export default function TripHistory() {
             />
           </View>
 
-          <Text style={styles.heading}>Today</Text>
+          {sortedDates.map((dateKey) => {
+            const heading = formatDateHeading(new Date(dateKey));
 
-          <View style={styles.imageContainer}>
-            <Image
-                source={require("../assets/images/location.png")}
-                style={styles.image}
-                resizeMode="contain"/>
-            <View style={styles.textContainer}>
-                <Pressable
-                    onPress={() =>
-                        router.push({
-                            pathname: "/trip-details",
-                        })
-                    }>
-                    <View style={styles.trip}>
-                        <Text style={styles.title}>One Ayala </Text>
-                        <Ionicons name="arrow-forward" size={18} color="#555" style={styles.arrow}/>
-                        <Text style={styles.title}> Pacita</Text>
-                    </View>
-                </Pressable>
-            </View>
-          </View>
-          <View style={styles.imageContainer}>
-            <Image
-                source={require("../assets/images/location.png")}
-                style={styles.image}
-                resizeMode="contain"/>
-            <View style={styles.textContainer}>
-                <Pressable
-                    onPress={() =>
-                        router.push({
-                            pathname: "/trip-details",
-                        })
-                    }>
-                    <View style={styles.trip}>
-                        <Text style={styles.title}>One Ayala </Text>
-                        <Ionicons name="arrow-forward" size={18} color="#555" style={styles.arrow}/>
-                        <Text style={styles.title}> Pacita</Text>
-                    </View>
-                </Pressable>
-            </View>
-          </View>
+            return (
+              <View key={dateKey}>
+                <Text style={styles.heading}>{heading}</Text>
 
-          <Text style={styles.heading}>Yesterday</Text>
-          <View style={styles.imageContainer}>
-            <Image
-                source={require("../assets/images/location.png")}
-                style={styles.image}
-                resizeMode="contain"/>
-            <View style={styles.textContainer}>
-                <Pressable
+                {groupedTrips[dateKey].map((trip) => (
+                  <Pressable
+                    key={trip.id}
                     onPress={() =>
-                        router.push({
-                            pathname: "/trip-details",
-                        })
-                    }>
-                    <View style={styles.trip}>
-                        <Text style={styles.title}>One Ayala </Text>
-                        <Ionicons name="arrow-forward" size={18} color="#555" style={styles.arrow}/>
-                        <Text style={styles.title}> Pacita</Text>
-                    </View>
-                </Pressable>
-            </View>
-          </View>
-          <View style={styles.imageContainer}>
-            <Image
-                source={require("../assets/images/location.png")}
-                style={styles.image}
-                resizeMode="contain"/>
-            <View style={styles.textContainer}>
-                <Pressable
-                    onPress={() =>
-                        router.push({
-                            pathname: "/trip-details",
-                        })
-                    }>
-                    <View style={styles.trip}>
-                        <Text style={styles.title}>One Ayala </Text>
-                        <Ionicons name="arrow-forward" size={18} color="#555" style={styles.arrow}/>
-                        <Text style={styles.title}> Pacita</Text>
-                    </View>
-                </Pressable>
-            </View>
-          </View>
-          <View style={styles.imageContainer}>
-            <Image
-                source={require("../assets/images/location.png")}
-                style={styles.image}
-                resizeMode="contain"/>
-            <View style={styles.textContainer}>
-                <Pressable
-                    onPress={() =>
-                        router.push({
-                            pathname: "/trip-details",
-                        })
-                    }>
-                    <View style={styles.trip}>
-                        <Text style={styles.title}>One Ayala </Text>
-                        <Ionicons name="arrow-forward" size={18} color="#555" style={styles.arrow}/>
-                        <Text style={styles.title}> Pacita</Text>
-                    </View>
-                </Pressable>
-            </View>
-          </View>
-          <View style={styles.imageContainer}>
-            <Image
-                source={require("../assets/images/location.png")}
-                style={styles.image}
-                resizeMode="contain"/>
-            <View style={styles.textContainer}>
-                <Pressable
-                    onPress={() =>
-                        router.push({
-                            pathname: "/trip-details",
-                        })
-                    }>
-                    <View style={styles.trip}>
-                        <Text style={styles.title}>One Ayala </Text>
-                        <Ionicons name="arrow-forward" size={18} color="#555" style={styles.arrow}/>
-                        <Text style={styles.title}> Pacita</Text>
-                    </View>
-                </Pressable>
-            </View>
-          </View>
+                      router.push({
+                        pathname: "/trip-details",
+                        params: {
+                          tripId: trip.id,
+                        },
+                      })
+                    }
+                  >
+                    <View style={styles.imageContainer}>
+                      <Image
+                        source={require("../assets/images/location.png")}
+                        style={styles.image}
+                      />
 
-          <Text style={styles.heading}>December 12, 2025</Text>
-          <View style={styles.imageContainer}>
-            <Image
-                source={require("../assets/images/location.png")}
-                style={styles.image}
-                resizeMode="contain"/>
-            <View style={styles.textContainer}>
-                <Pressable
-                    onPress={() =>
-                        router.push({
-                            pathname: "/trip-details",
-                        })
-                    }>
-                    <View style={styles.trip}>
-                        <Text style={styles.title}>One Ayala </Text>
-                        <Ionicons name="arrow-forward" size={18} color="#555" style={styles.arrow}/>
-                        <Text style={styles.title}> Pacita</Text>
+                      <View style={styles.textContainer}>
+                        <View style={styles.trip}>
+                          <Text style={styles.title}>{trip.origin}</Text>
+                          <Ionicons
+                            name="arrow-forward"
+                            size={16}
+                            color="#555"
+                            style={{ marginHorizontal: 6 }}
+                          />
+                          <Text style={styles.title}>
+                            {trip.destination}
+                          </Text>
+                        </View>
+
+                        <Text style={styles.subtitle}> Departed at: {""}
+                          {formatTime(trip.departed_at)}
+                        </Text>
+                      </View>
                     </View>
-                </Pressable>
-            </View>
-          </View>
-          <View style={styles.imageContainer}>
-            <Image
-                source={require("../assets/images/location.png")}
-                style={styles.image}
-                resizeMode="contain"/>
-            <View style={styles.textContainer}>
-                <Pressable
-                    onPress={() =>
-                        router.push({
-                            pathname: "/trip-details",
-                        })
-                    }>
-                    <View style={styles.trip}>
-                        <Text style={styles.title}>One Ayala </Text>
-                        <Ionicons name="arrow-forward" size={18} color="#555" style={styles.arrow}/>
-                        <Text style={styles.title}> Pacita</Text>
-                    </View>
-                </Pressable>
-            </View>
-          </View><View style={styles.imageContainer}>
-            <Image
-                source={require("../assets/images/location.png")}
-                style={styles.image}
-                resizeMode="contain"/>
-            <View style={styles.textContainer}>
-                <Pressable
-                    onPress={() =>
-                        router.push({
-                            pathname: "/trip-details",
-                        })
-                    }>
-                    <View style={styles.trip}>
-                        <Text style={styles.title}>One Ayala </Text>
-                        <Ionicons name="arrow-forward" size={18} color="#555" style={styles.arrow}/>
-                        <Text style={styles.title}> Pacita</Text>
-                    </View>
-                </Pressable>
-            </View>
-          </View>
+                  </Pressable>
+                ))}
+              </View>
+            );
+          })}
 
         </View>
       </ScrollView>

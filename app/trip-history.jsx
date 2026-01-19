@@ -155,7 +155,7 @@ export default function TripHistory() {
                       router.push({
                         pathname: "/trip-details",
                         params: {
-                          tripId: trip.id,
+                          trip_id: trip.id,
                         },
                       })
                     }

@@ -203,12 +203,6 @@ create: {
     fontSize: 14,
   },
 
-  error: {
-    color: "red",
-    marginBottom: 10,
-    fontFamily: "RobotoMono_500Medium",
-  },
-
   bottom: {
     flexDirection: "row",
     marginBottom: 60,
@@ -247,7 +241,6 @@ create: {
     marginBottom: 10,
     alignSelf: "stretch",
     alignItems: "center",
-    borderColor: "black",
     borderWidth: 1,
     borderColor: '#EBEAEC', 
   },

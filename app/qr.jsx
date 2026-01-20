@@ -193,7 +193,7 @@ export default function Qr() {
         </View>
 
         <Text style={qrstyles.subtitle}>
-          You're all set! Just show this QR to the attendant when boarding.
+          You`re all set! Just show this QR to the attendant when boarding.
         </Text>
 
         <Pressable style={qrstyles.button} onPress={() => handleLeaveQueue(queueId)}>

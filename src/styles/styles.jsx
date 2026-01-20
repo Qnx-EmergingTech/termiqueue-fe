@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
     marginTop: 5,
     width: screenWidth * 0.83,
     backgroundColor: "#F2F3F7",
-    color: "#A1A4B2",
+    color: "#3F414E",
     letterSpacing: 1,
     alignSelf: "center",
   },

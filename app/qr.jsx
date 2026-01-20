@@ -18,74 +18,84 @@ export default function Qr() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const fetchQueueDetails = async () => {
-      try {
-        const token = await AsyncStorage.getItem("firebaseIdToken");
-        
-        console.log("🔍 Fetching queue details...");
-        console.log("📦 Queue ID:", queueId);
-        console.log("📍 Destination from params:", destination);
-        
-        const response = await fetch(`${apiUrl}/queues/${queueId}/me/status`, {
+  const fetchQueueDetails = async () => {
+    try {
+      const token = await AsyncStorage.getItem("firebaseIdToken");
+
+      const response = await fetch(
+        `${apiUrl}/queues/${queueId}/me/status`,
+        {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        });
+        }
+      );
 
-        if (!response.ok) {
-          const err = await response.json();
-          console.error("❌ Error response:", err);
-          
-          if (err.detail === "User not found in queue" || err.detail?.includes("not found")) {
-            await AsyncStorage.removeItem("currentQueueId");
-          }
-          
-          throw new Error(err.detail?.[0]?.msg || err.detail || "Failed to fetch queue details");
+      if (!response.ok) {
+        const err = await response.json();
+
+        if (
+          err.detail === "User not found in queue" ||
+          err.detail?.includes("not found")
+        ) {
+          await AsyncStorage.removeItem("currentQueueId");
         }
 
-        const statusData = await response.json();
-        console.log("✅ User status data:", statusData);
-
-        console.log("🔍 Fetching QR code from API...");
-        const qrResponse = await fetch(`${apiUrl}/queues/${queueId}/my-qr-code`, {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (!qrResponse.ok) {
-          console.error("❌ Failed to fetch QR code");
-        } else {
-          const qrResult = await qrResponse.json();
-          console.log("📱 QR Response:", qrResult);
-          
-          const base64QR = qrResult.qr_base64 || qrResult.qr_code || qrResult.qr || qrResult.data || qrResult.image;
-          console.log("📱 QR Code (base64):", base64QR ? base64QR.substring(0, 50) + "..." : "null");
-          
-          setQrData(base64QR);
-        }
-
-        const combinedData = {
-          ...statusData,
-          destination: destination || statusData.destination || "Unknown",
-          bus_id: busId || statusData.bus_id || "N/A",
-          terminal_status: terminalStatus || "N/A",
-        };
-
-        console.log("📦 Combined queue data:", combinedData);
-        setQueue(combinedData);
-      } catch (err) {
-        console.error("❌ Fetch error:", err);
-        setError(err.message);
-      } finally {
-        setLoading(false);
+        throw new Error(err.detail || "Failed to fetch queue");
       }
-    };
 
-    if (queueId) fetchQueueDetails();
-  }, [queueId, destination, busId, terminalStatus]);
+      const statusData = await response.json();
+
+      if (statusData.status === "boarded") {
+        router.replace("/scan-success");
+        return;
+      }
+
+      const qrResponse = await fetch(
+        `${apiUrl}/queues/${queueId}/my-qr-code`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (qrResponse.ok) {
+        const qrResult = await qrResponse.json();
+        setQrData(
+          qrResult.qr_base64 ||
+            qrResult.qr_code ||
+            qrResult.qr ||
+            qrResult.data
+        );
+      }
+
+      setQueue({
+        ...statusData,
+        destination: destination || statusData.destination || "Unknown",
+        bus_id: busId || statusData.bus_id || "N/A",
+        terminal_status: terminalStatus || "N/A",
+      });
+
+      setError(null);
+    } catch (err) {
+      console.error("QR fetch error:", err);
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    let interval;
+
+    if (queueId) {
+      fetchQueueDetails();
+      interval = setInterval(fetchQueueDetails, 3000);
+    }
+
+    return () => clearInterval(interval);
+  }, [queueId]);
 
   if (loading) {
     return (
@@ -99,15 +109,14 @@ export default function Qr() {
   if (error) {
     return (
       <View style={qrstyles.container}>
-        <Text style={{ color: "red", marginBottom: 20, textAlign: "center", paddingHorizontal: 20 }}>
-          Error: {error}
+        <Text style={{ color: "red", textAlign: "center" }}>
+          {error}
         </Text>
-        <Text style={{ marginBottom: 20, textAlign: "center", paddingHorizontal: 20 }}>
-          {error.includes("not found") 
-            ? "You are not in this queue anymore. Please join a queue first."
-            : "Something went wrong loading your queue details."}
-        </Text>
-        <Pressable onPress={() => router.replace("/terminal")} style={qrstyles.button}>
+
+        <Pressable
+          onPress={() => router.replace("/terminal")}
+          style={qrstyles.button}
+        >
           <Text style={qrstyles.confirm}>Back to Terminals</Text>
         </Pressable>
       </View>
@@ -193,7 +202,7 @@ export default function Qr() {
         </View>
 
         <Text style={qrstyles.subtitle}>
-          You`re all set! Just show this QR to the attendant when boarding.
+          You are all set! Just show this QR to the attendant when boarding.
         </Text>
 
         <Pressable style={qrstyles.button} onPress={() => handleLeaveQueue(queueId)}>

@@ -1,8 +1,18 @@
 import { View, Text, StyleSheet, Image, Dimensions } from 'react-native'
-import React from 'react'
-import { Stack } from 'expo-router';
+import React, { useEffect } from 'react'
+import { Stack, useRouter } from 'expo-router';
 
 export default function ScanSuccess() {
+    const router = useRouter();
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            router.replace("/home");
+        }, 5000);
+
+        return () => clearTimeout(timer);
+    }, []);
+
   return (
      <>
       <Stack.Screen options={{ headerShown: false }} />

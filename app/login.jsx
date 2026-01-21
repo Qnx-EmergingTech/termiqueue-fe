@@ -2,8 +2,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Link, Stack, useRouter } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { getIdToken, signInWithEmailAndPassword } from "firebase/auth";
-import { useState, useEffect } from "react";
-import { Image, Pressable, Text, TextInput, View, KeyboardAvoidingView, Platform, ScrollView, TouchableWithoutFeedback,Keyboard } from "react-native";
+import { useState } from "react";
+import { Image, Pressable, Text, TextInput, View} from "react-native";
 import { auth } from "../firebaseConfig";
 import styles from "../src/styles/styles";
 import { setToken } from "../src/utils/authStorage";
@@ -13,24 +13,22 @@ SplashScreen.preventAutoHideAsync();
 
 export default function Login() {
   const router = useRouter();
-  const [appIsReady, setAppIsReady] = useState(false);
-  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [username, setUsername] = useState("");
-  const [keyboardVisible, setKeyboardVisible] = useState(false);
+  //const [keyboardVisible, setKeyboardVisible] = useState(false);
 
   const apiUrl = process.env.EXPO_PUBLIC_API_BASE_URL;
 
-  useEffect(() => {
-    const showSub = Keyboard.addListener("keyboardDidShow", () => setKeyboardVisible(true));
-    const hideSub = Keyboard.addListener("keyboardDidHide", () => setKeyboardVisible(false));
+  // useEffect(() => {
+  //   const showSub = Keyboard.addListener("keyboardDidShow", () => setKeyboardVisible(true));
+  //   const hideSub = Keyboard.addListener("keyboardDidHide", () => setKeyboardVisible(false));
 
-    return () => {
-      showSub.remove();
-      hideSub.remove();
-    };
-  }, []);
+  //   return () => {
+  //     showSub.remove();
+  //     hideSub.remove();
+  //   };
+  // }, []);
 
   const handleLogin = async () => {
     setError("");
@@ -102,7 +100,7 @@ export default function Login() {
         }}
       />
 
-      <KeyboardAvoidingView
+      {/* <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === "android" ? "height" : "padding"}
         keyboardVerticalOffset={Platform.OS === "android" ? 25 : 0}
@@ -111,7 +109,7 @@ export default function Login() {
         <ScrollView
           contentContainerStyle={{ flexGrow: 1 }}
           keyboardShouldPersistTaps="handled"
-        >
+        > */}
       <View style={styles.container}>
         <View style={styles.imageContainer}>
           <Image
@@ -123,7 +121,7 @@ export default function Login() {
           <View style={styles.welcome}>
             <Text style={styles.heading}>Welcome Back!</Text>
 
-          {!keyboardVisible && (
+          {/* {!keyboardVisible && ( */}
             <View style={{ width: '100%' }}>
             <Pressable style={styles.fbButton} onPress={handleFacebook}>
               <Text style={styles.loginText}>CONTINUE WITH FACEBOOK</Text>
@@ -133,7 +131,7 @@ export default function Login() {
               <Text style={styles.buttonText}>CONTINUE WITH GOOGLE</Text>
             </Pressable>
             </View>
-          )}
+          {/* )} */}
           </View>
         </View>
 
@@ -174,9 +172,9 @@ export default function Login() {
           </Link>
         </View>
       </View>
-      </ScrollView>
-      </TouchableWithoutFeedback>
-      </KeyboardAvoidingView>
+      {/* </ScrollView> */}
+      {/* </TouchableWithoutFeedback>
+      </KeyboardAvoidingView> */}
     </>
   );
 }

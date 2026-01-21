@@ -13,7 +13,7 @@ import {
 } from 'react-native';
 
 
-export default function logoutModal() {
+export default function LogoutModal() {
   const router = useRouter();
   const [visible, setVisible] = useState(true);
 
@@ -68,7 +68,7 @@ export default function logoutModal() {
                 <Text style={styles.cancelbutton}>Cancel</Text>
               </Pressable>
             </View>
-          </TouchableWithoutFeedback>
+            </TouchableWithoutFeedback>
         </View>
       </TouchableWithoutFeedback>
     </Modal>
@@ -88,7 +88,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 12,
     padding: 20,
-    alignItems: 'left',
+    alignItems: 'flex-start',
     gap: 12,
   },
   closeIcon: {

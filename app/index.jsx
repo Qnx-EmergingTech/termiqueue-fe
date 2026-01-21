@@ -19,18 +19,17 @@ export default function Index() {
           router.replace('/home');
         } else {
           console.log('❌ User not authenticated, showing landing page');
-          setIsCheckingAuth(false); // Show landing page
+          setIsCheckingAuth(false);
         }
       } catch (error) {
         console.error('Error checking auth:', error);
-        setIsCheckingAuth(false); // Show landing page on error
+        setIsCheckingAuth(false); 
       }
     };
 
     checkAuth();
-  }, []);
+  }, [router]);
 
-  // Show loading spinner while checking auth
   if (isCheckingAuth) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#fff' }}>

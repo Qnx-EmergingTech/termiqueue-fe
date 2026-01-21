@@ -17,7 +17,7 @@ import { auth } from "../firebaseConfig";
 import styles from "../src/styles/styles";
 import { getToken } from "../src/utils/authStorage";
 
-export default function Index() {
+export default function Kyc() {
   const router = useRouter();
   
   const [firstname, setFirstName] = useState("");

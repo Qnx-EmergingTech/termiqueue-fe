@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Stack, useRouter } from "expo-router";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import {
   Alert,
   Dimensions,
@@ -21,7 +21,7 @@ export default function TripHistory() {
 
   const apiUrl = process.env.EXPO_PUBLIC_API_BASE_URL;
 
-  const fetchTripHistory = async () => {
+  const fetchTripHistory = useCallback(async () => {
     try {
         const token = await AsyncStorage.getItem("firebaseIdToken");
 
@@ -42,11 +42,11 @@ export default function TripHistory() {
     } catch (error) {
         console.error("Error fetching trip history:", error);
     }
- };
+ }, [apiUrl]);
 
     useEffect(() => {
         fetchTripHistory();
-    }, []);
+    }, [fetchTripHistory]);
 
     const isToday = (date) => {
     const today = new Date();

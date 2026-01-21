@@ -37,21 +37,8 @@ import {
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-  const [fontsLoaded] = useFonts({
-    Inter_400Regular,
-    Inter_600SemiBold,
-    Inter_700Bold,
-    Roboto_400Regular,
-    Roboto_500Medium,
-    Roboto_700Bold,
-    RobotoMono_400Regular,
-    RobotoMono_500Medium,
-    RobotoMono_700Bold,
-  });
-
   const [isAuthenticated, setIsAuthenticated] = useState(null);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
-  const [appReady, setAppReady] = useState(false);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -117,14 +104,30 @@ export default function RootLayout() {
     };
   }, [isAuthenticated]);
 
+  const [fontsLoaded] = useFonts({
+    Inter_400Regular,
+    Inter_600SemiBold,
+    Inter_700Bold,
+    Roboto_400Regular,
+    Roboto_500Medium,
+    Roboto_700Bold,
+    RobotoMono_400Regular,
+    RobotoMono_500Medium,
+    RobotoMono_700Bold,
+  });
+
   const onLayoutRootView = useCallback(async () => {
     if (fontsLoaded && !isCheckingAuth) {
       await SplashScreen.hideAsync();
     }
   }, [fontsLoaded, isCheckingAuth]);
 
-  if (!fontsLoaded || isCheckingAuth || !appReady) {
-    return <SafeScreen onLayout={onLayoutRootView} />;
+  if (!fontsLoaded || isCheckingAuth) {
+    return (
+      <SafeScreen onLayout={onLayoutRootView}>
+        <Stack />
+      </SafeScreen>
+    );
   }
 
   return (

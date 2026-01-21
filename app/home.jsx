@@ -46,7 +46,7 @@ export default function Home() {
     }
   };
 
-  const fetchProfile = async () => {
+  const fetchProfile = useCallback(async () => {
     try {
       const token = await AsyncStorage.getItem("firebaseIdToken");
       if (!token) return;
@@ -59,9 +59,9 @@ export default function Home() {
     } catch (error) {
       console.error("Error fetching profile:", error);
     }
-  };
+  }, [apiUrl]);
 
-  const fetchCurrentQueue = async () => {
+  const fetchCurrentQueue = useCallback(async () => {
     try {
       const token = await AsyncStorage.getItem("firebaseIdToken");
       const queueId = await AsyncStorage.getItem("currentQueueId");
@@ -97,9 +97,9 @@ export default function Home() {
     } catch (e) {
       console.error("Queue fetch failed:", e);
     }
-  };
+  }, [apiUrl]);
 
-  const fetchLocationAndGeofence = async () => {
+  const fetchLocationAndGeofence = useCallback(async () => {
     try {
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
@@ -134,16 +134,16 @@ export default function Home() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [apiUrl]);
 
   useEffect(() => {
     fetchProfile();
     fetchLocationAndGeofence();
-  }, []);
+  }, [fetchProfile, fetchLocationAndGeofence]);
 
   useFocusEffect(useCallback(() => {
     fetchCurrentQueue();
-  }, []));
+  }, [fetchCurrentQueue]));
 
   useEffect(() => {
     setInRange(geofenceStatus?.can_join ?? false);

@@ -75,7 +75,6 @@
     },
     "extra": {
       "router": {},
-      "apiUrl": "http://44.202.107.196:8080",
       "eas": {
         "projectId": "7a1bbd01-676f-4b23-9302-3ae552f9e67f"
       }

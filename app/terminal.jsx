@@ -32,8 +32,11 @@ export default function Terminals() {
         console.error("Error fetching terminals:", error);
       }
     };
+
+    if (apiUrl) {
     fetchTerminals();
-  }, []);
+    }
+  }, [apiUrl]);
 
   const handleJoinQueue = async (terminalId) => {
     try {
@@ -43,7 +46,6 @@ export default function Terminals() {
         return;
       }
 
-      // Find the terminal info from terminals state
       const terminal = terminals.find((t) => t.id === terminalId);
 
       const joinResponse = await fetch(`${apiUrl}/queues/${terminalId}/join`, {

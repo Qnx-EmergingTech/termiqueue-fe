@@ -1,6 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { ActivityIndicator, Dimensions, Image, Pressable, Text, View } from "react-native";
 import QRCode from 'react-native-qrcode-svg';
 import qrstyles from "../src/styles/qrStyles";
@@ -18,7 +18,7 @@ export default function Qr() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const fetchQueueDetails = async () => {
+  const fetchQueueDetails = useCallback(async () => {
     try {
       const token = await AsyncStorage.getItem("firebaseIdToken");
 
@@ -84,7 +84,7 @@ export default function Qr() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [queueId, apiUrl, destination, busId, terminalStatus, router]);
 
   useEffect(() => {
     let interval;
@@ -95,7 +95,7 @@ export default function Qr() {
     }
 
     return () => clearInterval(interval);
-  }, [queueId]);
+  }, [queueId, fetchQueueDetails]);
 
   if (loading) {
     return (

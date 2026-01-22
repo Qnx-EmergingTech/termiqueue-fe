@@ -34,7 +34,7 @@ import {
   setupNotificationOpenHandler,
 } from "../src/utils/pushNotifications";
 
-SplashScreen.preventAutoHideAsync();
+//SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const [isAuthenticated, setIsAuthenticated] = useState(null);

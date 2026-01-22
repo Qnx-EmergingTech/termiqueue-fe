@@ -40,7 +40,7 @@ useEffect(() => {
     if (trip_id) {
       fetchTripDetails();
     }
-  }, [trip_id]);
+  }, [trip_id, apiUrl]);
 
   if (loading) {
     return (

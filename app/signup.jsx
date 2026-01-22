@@ -1,4 +1,4 @@
-import Checkbox from 'expo-checkbox';
+import { Checkbox } from 'expo-checkbox';
 import { Link, Stack, useRouter } from "expo-router";
 import { createUserWithEmailAndPassword, getIdToken } from "firebase/auth";
 import { useState } from "react";

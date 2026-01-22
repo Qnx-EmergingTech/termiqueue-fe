@@ -11,7 +11,7 @@ export default function ScanSuccess() {
         }, 5000);
 
         return () => clearTimeout(timer);
-    }, []);
+    }, [router]);
 
   return (
      <>
@@ -49,7 +49,7 @@ export default function ScanSuccess() {
   );
 }
 
-const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
+const { height: screenHeight } = Dimensions.get('window');
 const styles = StyleSheet.create({
     container: {
     flex: 1,

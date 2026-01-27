@@ -133,12 +133,14 @@ export default function Terminals() {
 
   return (
     <>
+    <View style={{ flex: 1, backgroundColor: "white" }}>
       <Stack.Screen
         options={{
           headerShown: true,
           headerTitle: "Please select a bus",
           headerTransparent: false,
           headerBackTitleVisible: false,
+          headerBackVisible: false,
           headerTitleStyle: {
             fontFamily: "Roboto_700Bold",
             fontSize: 20,
@@ -196,6 +198,11 @@ export default function Terminals() {
           ))}
         </View>
       </ScrollView>
+
+      <Pressable style={styles.returnHomeButton} onPress={() => router.replace("/home")}>
+        <Text style={styles.returnHomeText}>Return to Home</Text>
+      </Pressable>
+    </View>
     </>
   );
 }
@@ -259,4 +266,21 @@ const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
   },
+  returnHomeButton: {
+  position: "absolute",
+  bottom: 30,
+  alignSelf: "center",
+  width: Dimensions.get("window").width * 0.85,
+  backgroundColor: "white",
+  borderWidth: 1,
+  borderColor: "#096B72",
+  paddingVertical: 14,
+  borderRadius: 24,
+  alignItems: "center",
+},
+returnHomeText: {
+  fontSize: 16,
+  fontFamily: "Roboto_500Medium",
+  color: "#096B72",
+},
 });

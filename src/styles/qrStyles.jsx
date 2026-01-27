@@ -6,7 +6,6 @@ const qrstyles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: "white",
-        padding: 20,
     },
     title: {
         fontFamily: "Roboto_700Bold",
@@ -36,26 +35,43 @@ const qrstyles = StyleSheet.create({
     },
     qrWrapper: {
         alignItems: "center",   
-        marginBottom: 20,  
+        marginBottom: 20,
+        marginTop: 20,
     },
     button: {
-        backgroundColor: "#096B72",
+        backgroundColor: "#E3655B",
         paddingVertical: 12,
-        paddingHorizontal: 24,
         borderRadius: 20,
-        marginTop: 60,
-        marginBottom: 20,
+        marginBottom: 12,
         width: screenWidth * 0.83,
         alignItems: "center",
-        alignSelf: "center",
-        position: "absolute",
-        bottom: 40,
+    },
+    rbutton: {
+        borderColor: "#E3655B",
+        backgroundColor: "white",
+        paddingVertical: 12,
+        borderRadius: 20,
+        borderWidth: 1,
+        marginBottom: 12,
+        width: screenWidth * 0.83,
+        alignItems: "center",
     },
     confirm: {
         fontFamily: "Roboto_500Medium",
         color: "white",
         fontSize: 14,
-    }
+    },
+    return: {
+        fontFamily: "Roboto_500Medium",
+        color: "#E3655B",
+        fontSize: 14,
+    },
+    bottomButtons: {
+     position: "absolute",
+     bottom: 40,
+     width: "100%",
+     alignItems: "center",
+},
 });
 
 export default qrstyles;

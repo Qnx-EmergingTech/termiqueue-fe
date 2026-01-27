@@ -91,7 +91,7 @@ export default function Qr() {
 
     if (queueId) {
       fetchQueueDetails();
-      interval = setInterval(fetchQueueDetails, 3000);
+      interval = setInterval(fetchQueueDetails, 5000);
     }
 
     return () => clearInterval(interval);
@@ -132,6 +132,10 @@ export default function Qr() {
     });
   };
 
+  const handleReturn = () => {          
+    router.replace('/home');          
+  };
+
   return (
     <>
       <Stack.Screen
@@ -140,6 +144,7 @@ export default function Qr() {
           headerTitle: 'Bus details',
           headerTransparent: false,
           headerBackTitleVisible: false,
+          headerBackVisible: false,
           headerTitleStyle: {
             fontFamily: 'Roboto_700Bold',
             fontSize: 20,
@@ -169,7 +174,18 @@ export default function Qr() {
           )}
         </View>
 
-        <Text style={qrstyles.title}>Terminal {queue.destination || "N/A"}</Text>
+      <View style={{ padding: 20 }}>
+        <Text style={qrstyles.title}>ONE AYALA TERMINAL</Text>
+
+        <View style={qrstyles.textContainer}>
+          <Text style={qrstyles.info}>Departure</Text>
+          <Image
+            source={require('../assets/images/bus-school.png')}
+            style={qrstyles.image}
+            resizeMode="contain"
+          />
+          <Text style={qrstyles.info}>One Ayala</Text>
+        </View>
 
         <View style={qrstyles.textContainer}>
           <Text style={qrstyles.info}>Destination</Text>
@@ -181,33 +197,30 @@ export default function Qr() {
           <Text style={qrstyles.info}>{queue.destination}</Text>
         </View>
 
-        <View style={qrstyles.textContainer}>
-          <Text style={qrstyles.info}>Terminal Status</Text>
-          <Image
-            source={require('../assets/images/bus-school.png')}
-            style={qrstyles.image}
-            resizeMode="contain"
-          />
-          <Text style={qrstyles.info}>{queue.terminal_status}</Text>
-        </View>
-
-        <View style={qrstyles.textContainer}>
+        {/* <View style={qrstyles.textContainer}>
           <Text style={qrstyles.info}>Your Status - </Text>
           <Text style={qrstyles.info}>{queue.status || "waiting"}</Text>
-        </View>
+        </View> */}
 
         <View style={qrstyles.textContainer}>
-          <Text style={qrstyles.info}>Queue number - </Text>
-          <Text style={qrstyles.info}>#{queue.queue_number}</Text>
+          <Text style={qrstyles.info}>Ticket number - </Text>
+          <Text style={qrstyles.info}>#{queue.ticket_number}</Text>
         </View>
 
         <Text style={qrstyles.subtitle}>
           You are all set! Just show this QR to the attendant when boarding.
         </Text>
+      </View>
 
+      <View style={qrstyles.bottomButtons}>
         <Pressable style={qrstyles.button} onPress={() => handleLeaveQueue(queueId)}>
           <Text style={qrstyles.confirm}>Cancel Queue</Text>
         </Pressable>
+
+        <Pressable style={qrstyles.rbutton} onPress={handleReturn}>
+          <Text style={qrstyles.return}>Return to Home</Text>
+        </Pressable>
+      </View>
       </View>
     </>
   );

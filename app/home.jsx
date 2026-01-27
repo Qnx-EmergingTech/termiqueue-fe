@@ -91,7 +91,7 @@ export default function Home() {
       setCurrentQueue({
         queueId,
         destination: terminal?.destination ?? "Unknown",
-        queueNumber: statusData.queue_number,
+        queueNumber: statusData.ticket_number,
         status: statusData.status,
       });
     } catch (e) {
@@ -301,7 +301,7 @@ export default function Home() {
                     {currentQueue.destination}
                   </Text>
                   <Text style={hstyles.stitle}>
-                    Queue #{currentQueue.queueNumber} • {currentQueue.status}
+                    Ticket # {currentQueue.queueNumber} • {currentQueue.status} for bus arrival
                   </Text>
                 </>
               ) : (

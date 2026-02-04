@@ -121,6 +121,7 @@ export default function TripHistory() {
       />
 
       <ScrollView
+        style={{ flex: 1, backgroundColor: "white" }}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={true}
       >
@@ -255,6 +256,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
+    backgroundColor: "white",
   },
   dateHeader: {
   fontSize: 14,

@@ -301,7 +301,12 @@ export default function Home() {
                     {currentQueue.destination}
                   </Text>
                   <Text style={hstyles.stitle}>
-                    Ticket # {currentQueue.queueNumber} • {currentQueue.status} for bus arrival
+                    Ticket # {currentQueue.queueNumber} • {currentQueue.status}
+                    {currentQueue.status === "waiting"
+                      ? " for bus arrival"
+                      : currentQueue.status === "boarded"
+                      ? ", waiting for departure"
+                      : ""}
                   </Text>
                 </>
               ) : (

@@ -1,9 +1,10 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { ActivityIndicator, Dimensions, Image, Pressable, Text, View } from "react-native";
 import QRCode from 'react-native-qrcode-svg';
 import qrstyles from "../src/styles/qrStyles";
+import { jwtDecode } from "jwt-decode";
 
 export default function Qr() {
   const router = useRouter();
@@ -17,6 +18,25 @@ export default function Qr() {
   const [qrData, setQrData] = useState(null); 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [userId, setUserId] = useState(null);
+
+  const wsRef = useRef(null);
+  const pollRef = useRef(null);
+
+ useEffect(() => {
+    const initUserId = async () => {
+      const token = await AsyncStorage.getItem("firebaseIdToken");
+      if (!token) return;
+
+      const decoded = jwtDecode(token);
+      const uid = decoded.user_id || decoded.sub;
+
+      console.log("[QR] userId initialized:", uid);
+      setUserId(uid);
+    };
+
+    initUserId();
+  }, []);
 
   const fetchQueueDetails = useCallback(async () => {
     try {
@@ -39,6 +59,8 @@ export default function Qr() {
           err.detail?.includes("not found")
         ) {
           await AsyncStorage.removeItem("currentQueueId");
+          router.replace("/terminal");
+          return;
         }
 
         throw new Error(err.detail || "Failed to fetch queue");
@@ -87,16 +109,90 @@ export default function Qr() {
   }, [queueId, apiUrl, destination, busId, terminalStatus, router]);
 
   useEffect(() => {
-    let interval;
-
-    if (queueId) {
-      fetchQueueDetails();
-      interval = setInterval(fetchQueueDetails, 5000);
-    }
-
-    return () => clearInterval(interval);
+    if (queueId) fetchQueueDetails();
   }, [queueId, fetchQueueDetails]);
 
+useEffect(() => {
+    if (!queueId || !userId) return;
+
+    let ws;
+
+    const connectWS = async () => {
+      const token = await AsyncStorage.getItem("firebaseIdToken");
+      if (!token) return;
+
+      const wsUrl = `${apiUrl.replace(
+        /^http/,
+        "ws"
+      )}/queues/ws/queues/${queueId}?token=${token}`;
+
+      ws = new WebSocket(wsUrl);
+      wsRef.current = ws;
+
+      ws.onopen = () => console.log("[WS] Connected");
+
+      ws.onmessage = (event) => {
+        try {
+          const msg = JSON.parse(event.data);
+          console.log("[WS] Event:", msg);
+
+          if (msg.type === "PASSENGER_BOARDED") {
+            const payload = msg.payload;
+
+            if (
+              payload.user_id === userId ||
+              payload.ticket_number === queue?.ticket_number
+            ) {
+              console.log("[WS] ✅ Boarding confirmed");
+              cleanup();
+              router.replace("/scan-success");
+            }
+          }
+        } catch (e) {
+          console.error("[WS] Parse error:", e);
+        }
+      };
+
+      ws.onerror = (e) => console.error("[WS] Error:", e);
+      ws.onclose = () => console.log("[WS] Closed");
+    };
+
+    const startPolling = async () => {
+      pollRef.current = setInterval(async () => {
+        const token = await AsyncStorage.getItem("firebaseIdToken");
+        const res = await fetch(
+          `${apiUrl}/queues/${queueId}/me/status`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+
+        if (!res.ok) return;
+
+        const data = await res.json();
+        if (data.status === "boarded") {
+          console.log("[POLL] Boarding detected");
+          cleanup();
+          router.replace("/scan-success");
+        }
+      }, 3000);
+    };
+
+    const cleanup = () => {
+      if (wsRef.current) {
+        wsRef.current.close();
+        wsRef.current = null;
+      }
+      if (pollRef.current) {
+        clearInterval(pollRef.current);
+        pollRef.current = null;
+      }
+    };
+
+    connectWS();
+    startPolling();
+
+    return cleanup;
+  }, [queueId, userId, apiUrl, router, queue?.ticket_number]);
+  
   if (loading) {
     return (
       <View style={qrstyles.container}>
@@ -126,6 +222,11 @@ export default function Qr() {
   if (!queue) return null;
 
   const handleLeaveQueue = (terminalId) => {
+    if (wsRef.current) {
+    wsRef.current.close();
+    wsRef.current = null;
+   }
+
     router.push({
       pathname: "/cancelModal",
       params: { queueId: terminalId },
@@ -203,7 +304,7 @@ export default function Qr() {
         </View> */}
 
         <View style={qrstyles.textContainer}>
-          <Text style={qrstyles.info}>Ticket number - </Text>
+          <Text style={qrstyles.info}>Ticket number </Text>
           <Text style={qrstyles.info}>#{queue.ticket_number}</Text>
         </View>
 

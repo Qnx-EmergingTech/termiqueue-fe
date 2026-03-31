@@ -139,6 +139,7 @@ export default function Login() {
           <TextInput
             style={styles.input}
             placeholder="Username"
+            placeholderTextColor="#A1A4B2"
             autoCapitalize="none"
             value={username}
             onChangeText={setUsername}
@@ -149,6 +150,7 @@ export default function Login() {
           <TextInput
             style={styles.input}
             placeholder="Enter your password"
+            placeholderTextColor="#A1A4B2"
             secureTextEntry
             value={password}
             onChangeText={setPassword}

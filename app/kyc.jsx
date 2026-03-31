@@ -112,6 +112,7 @@ export default function Kyc() {
               <TextInput
                 style={styles.input}
                 placeholder="First Name"
+                placeholderTextColor="#A1A4B2"
                 value={firstname}
                 onChangeText={setFirstName}
               />
@@ -121,6 +122,7 @@ export default function Kyc() {
               <TextInput
                 style={styles.input}
                 placeholder="Middle Name (Optional)"
+                placeholderTextColor="#A1A4B2"
                 value={middlename}
                 onChangeText={setMiddleName}
               />
@@ -130,6 +132,7 @@ export default function Kyc() {
               <TextInput
                 style={styles.input}
                 placeholder="Last Name"
+                placeholderTextColor="#A1A4B2"
                 value={lastname}
                 onChangeText={setLastName}
               />
@@ -140,6 +143,7 @@ export default function Kyc() {
                 <TextInput
                   style={[styles.input, { paddingRight: 40 }]}
                   placeholder="Birthdate (YYYY-MM-DD)"
+                  placeholderTextColor="#A1A4B2"
                   value={birthdate}
                   onChangeText={setBirthdate}
                   keyboardType="numbers-and-punctuation"
@@ -178,6 +182,7 @@ export default function Kyc() {
               <TextInput
                 style={styles.input}
                 placeholder="Contact number"
+                placeholderTextColor="#A1A4B2"
                 value={contact}
                 onChangeText={setContact}
               />

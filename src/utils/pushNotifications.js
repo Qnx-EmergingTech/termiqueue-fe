@@ -37,7 +37,9 @@ export async function sendTokenToServer(token, userId) {
   if (!token) return null;
 
   try {
-    const BACKEND_URL = 'http://44.202.107.196:8080/profiles/register-fcm';
+    const apiUrl = process.env.EXPO_PUBLIC_API_BASE_URL;
+    const BACKEND_URL = `${apiUrl}/profiles/register-fcm`;
+    
     const res = await fetch(BACKEND_URL, {
       method: 'POST',
       headers: {

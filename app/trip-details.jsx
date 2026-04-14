@@ -92,7 +92,7 @@ useEffect(() => {
             <Ionicons
               name="arrow-forward"
               size={18}
-              color="#555"
+              color="#096B72"
               style={{ marginHorizontal: 6 }}
             />
             <Text style={styles.title}>{trip.destination}</Text>
@@ -105,7 +105,7 @@ useEffect(() => {
 
         <View style={styles.details}>
           <Text style={styles.data}>
-            Bus Number: {trip.bus_number}
+            Shuttle Number: {trip.bus_number}
           </Text>
           <Text style={styles.data}>
             Origin: {trip.origin}
@@ -148,6 +148,7 @@ heading: {
   title: {
     fontSize: 34,
     fontWeight: "bold",
+    color: "#096B72",
   },
   text: {
     fontSize: 18,

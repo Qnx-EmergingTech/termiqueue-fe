@@ -242,7 +242,7 @@ useEffect(() => {
       <Stack.Screen
         options={{
           headerShown: true,
-          headerTitle: 'Bus details',
+          headerTitle: 'Shuttle Details',
           headerTransparent: false,
           headerBackTitleVisible: false,
           headerBackVisible: false,
@@ -276,7 +276,7 @@ useEffect(() => {
         </View>
 
       <View style={{ padding: 20 }}>
-        <Text style={qrstyles.title}>ONE AYALA TERMINAL</Text>
+        <Text style={qrstyles.title}>QNX SHUTTLE SERVICE</Text>
 
         <View style={qrstyles.textContainer}>
           <Text style={qrstyles.info}>Departure</Text>
@@ -285,7 +285,7 @@ useEffect(() => {
             style={qrstyles.image}
             resizeMode="contain"
           />
-          <Text style={qrstyles.info}>One Ayala</Text>
+          <Text style={qrstyles.info}>178 Yakal</Text>
         </View>
 
         <View style={qrstyles.textContainer}>

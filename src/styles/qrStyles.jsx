@@ -11,6 +11,7 @@ const qrstyles = StyleSheet.create({
         fontFamily: "Roboto_700Bold",
         fontSize: 20,
         marginBottom: 15,
+        color: "#E3655B",
     },
     info: {
         fontFamily: "Roboto_500Medium",

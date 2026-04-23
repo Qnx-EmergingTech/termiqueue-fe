@@ -32,5 +32,10 @@
   },
   "submit": {
     "production": {}
+  },
+  "hooks": {
+    "postGenerate": {
+      "command": "./eas-hooks/eas-build-pre-install.sh"
+    }
   }
 }

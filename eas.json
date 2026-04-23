@@ -27,15 +27,13 @@
       },
       "ios": {
         "resourceClass": "m-medium"
+      },
+      "postGenerate": {
+        "command": "./eas-hooks/eas-build-pre-install.sh"
       }
     }
   },
   "submit": {
     "production": {}
-  },
-  "hooks": {
-    "postGenerate": {
-      "command": "./eas-hooks/eas-build-pre-install.sh"
-    }
   }
 }

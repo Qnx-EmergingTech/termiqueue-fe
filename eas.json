@@ -26,10 +26,10 @@
         "EXPO_PUBLIC_API_BASE_URL": "https://epipetalous-ashton-casuistically.ngrok-free.dev"
       },
       "ios": {
-        "resourceClass": "m-medium"
-      },
-      "postGenerate": {
-        "command": "./eas-hooks/eas-build-pre-install.sh"
+        "resourceClass": "m-medium",
+        "config": {
+          "usesNonExemptEncryption": false
+        }
       }
     }
   },

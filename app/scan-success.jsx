@@ -20,13 +20,13 @@ export default function ScanSuccess() {
       <View style={styles.container}>
         <View style={styles.imageContainer}>
           <Image
-            source={require('../assets/images/scan.png')}
+            source={require('../assets/images/scan1.png')}
             style={styles.image}
             resizeMode="cover"
           />
 
           <Image
-            source={require('../assets/images/Logo.png')}
+            source={require('../assets/images/logo1.png')}
             style={styles.logo}
             resizeMode="cover"
           />

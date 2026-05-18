@@ -113,7 +113,7 @@ export default function Login() {
       <View style={styles.container}>
         <View style={styles.imageContainer}>
           <Image
-            source={require('../assets/images/Blob.png')}
+            source={require('../assets/images/blob1.png')}
             style={styles.imageBg}
             resizeMode="stretch"
           />

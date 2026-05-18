@@ -40,7 +40,7 @@ const qrstyles = StyleSheet.create({
         marginTop: 20,
     },
     button: {
-        backgroundColor: "#E3655B",
+        backgroundColor: "#f5580c",
         paddingVertical: 12,
         borderRadius: 20,
         marginBottom: 12,
@@ -48,7 +48,7 @@ const qrstyles = StyleSheet.create({
         alignItems: "center",
     },
     rbutton: {
-        borderColor: "#E3655B",
+        borderColor: "#f5580c",
         backgroundColor: "white",
         paddingVertical: 12,
         borderRadius: 20,
@@ -64,7 +64,7 @@ const qrstyles = StyleSheet.create({
     },
     return: {
         fontFamily: "Roboto_500Medium",
-        color: "#E3655B",
+        color: "#f5580c",
         fontSize: 14,
     },
     bottomButtons: {

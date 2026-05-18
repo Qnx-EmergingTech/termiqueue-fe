@@ -50,13 +50,13 @@ export default function Index() {
       <View style={styles.container}>
         <View style={styles.imageContainer}>
           <Image
-            source={require('../assets/images/Frame.png')}
+            source={require('../assets/images/Frame1.png')}
             style={styles.image}
             resizeMode="cover"
           />
 
           <Image
-            source={require('../assets/images/Logo.png')}
+            source={require('../assets/images/logo1.png')}
             style={styles.logo}
             resizeMode="cover"
           />

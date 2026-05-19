@@ -105,7 +105,7 @@ useEffect(() => {
 
         <View style={styles.details}>
           <Text style={styles.data}>
-            Bus Number: {trip.bus_number}
+            Shuttle Number: {trip.bus_number}
           </Text>
           <Text style={styles.data}>
             Origin: {trip.origin}

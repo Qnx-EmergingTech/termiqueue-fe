@@ -85,7 +85,7 @@ export default function Kyc() {
         <View style={styles.container}>
           <View style={styles.imageContainer}>
             <ImageBackground
-              source={require("../assets/images/Blob.png")}
+              source={require("../assets/images/blob1.png")}
               style={styles.imageBg}
               resizeMode="stretch"
             />

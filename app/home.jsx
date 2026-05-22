@@ -266,12 +266,12 @@ export default function Home() {
         )}
 
         {isLoading ? (
-          <ActivityIndicator size="large" color="#020eba" style={{ marginTop: 10 }} />
+          <ActivityIndicator size="large" color="#096B72" style={{ marginTop: 10 }} />
         ) : (
           <>
             {geofenceStatus?.can_join ? (
               <>
-                <Text style={[hstyles.out, { color: "#020eba" }]}>In Range!</Text>
+                <Text style={[hstyles.out, { color: "#096B72" }]}>In Range!</Text>
                 <Text style={hstyles.outtext}>You are within the queueing area, please select your bus to queue.</Text>
               </>
             ) : (

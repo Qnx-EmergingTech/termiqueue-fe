@@ -82,7 +82,7 @@ export default function Signup() {
       <View style={styles.container}>
         <View style={styles.imageContainer}>
     <Image
-      source={require('../assets/images/blob1.png')}
+      source={require('../assets/images/Blob.png')}
       style={styles.imageBg}
       resizeMode="cover"
     />

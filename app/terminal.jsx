@@ -175,7 +175,7 @@ export default function Terminals() {
             <Pressable key={terminal.id} onPress={() => handleJoinQueue(terminal.id)}>
               <View style={styles.imageContainer}>
                 <Image
-                  source={require("../assets/images/location1.png")}
+                  source={require("../assets/images/location.png")}
                   style={styles.image}
                   resizeMode="contain"
                 />
@@ -260,7 +260,7 @@ const styles = StyleSheet.create({
     color: "#A1A4B2",
   },
   inQueueText: {
-    color: "#020eba",
+    color: "#59A96A",
     fontWeight: "600",
   },
   scrollContent: {
@@ -273,7 +273,7 @@ const styles = StyleSheet.create({
   width: Dimensions.get("window").width * 0.85,
   backgroundColor: "white",
   borderWidth: 1,
-  borderColor: "#020eba",
+  borderColor: "#096B72",
   paddingVertical: 14,
   borderRadius: 24,
   alignItems: "center",
@@ -281,6 +281,6 @@ const styles = StyleSheet.create({
 returnHomeText: {
   fontSize: 16,
   fontFamily: "Roboto_500Medium",
-  color: "#020eba",
+  color: "#096B72",
 },
 });

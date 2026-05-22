@@ -11,7 +11,6 @@ const qrstyles = StyleSheet.create({
         fontFamily: "Roboto_700Bold",
         fontSize: 20,
         marginBottom: 15,
-        color: "#E3655B",
     },
     info: {
         fontFamily: "Roboto_500Medium",
@@ -40,7 +39,7 @@ const qrstyles = StyleSheet.create({
         marginTop: 20,
     },
     button: {
-        backgroundColor: "#f5580c",
+        backgroundColor: "#E3655B",
         paddingVertical: 12,
         borderRadius: 20,
         marginBottom: 12,
@@ -48,7 +47,7 @@ const qrstyles = StyleSheet.create({
         alignItems: "center",
     },
     rbutton: {
-        borderColor: "#f5580c",
+        borderColor: "#E3655B",
         backgroundColor: "white",
         paddingVertical: 12,
         borderRadius: 20,
@@ -64,7 +63,7 @@ const qrstyles = StyleSheet.create({
     },
     return: {
         fontFamily: "Roboto_500Medium",
-        color: "#f5580c",
+        color: "#E3655B",
         fontSize: 14,
     },
     bottomButtons: {

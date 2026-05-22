@@ -116,7 +116,7 @@ const styles = StyleSheet.create({
     textAlign: "justify",
   },
   button: {
-    backgroundColor: "##020eba",
+    backgroundColor: "#096B72",
     borderRadius: 20,
     paddingVertical: 10,
     paddingHorizontal: 20,
@@ -130,7 +130,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     alignItems: 'center',
     marginTop: 5,
-    borderColor: "#020eba",
+    borderColor: "#096B72",
     borderWidth: 1,
   },
   icon: {

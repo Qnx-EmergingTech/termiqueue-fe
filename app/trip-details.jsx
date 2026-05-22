@@ -148,7 +148,6 @@ heading: {
   title: {
     fontSize: 34,
     fontWeight: "bold",
-    color: "#096B72",
   },
   text: {
     fontSize: 18,
@@ -174,7 +173,7 @@ heading: {
   },
   back: {
     marginTop: 30,
-    color: "#020eba",
+    color: "#096B72",
     fontSize: 16,
   },
   loading: {

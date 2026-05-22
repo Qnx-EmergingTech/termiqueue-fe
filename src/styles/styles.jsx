@@ -62,7 +62,7 @@ const styles = StyleSheet.create({
 
   italic: {
     fontFamily: "Roboto_500Medium",
-    color: "#020eba",
+    color: "#096B72",
   },
 
   field: {
@@ -156,7 +156,7 @@ create: {
 },
 
   loginButton: {
-    backgroundColor: "#020eba",
+    backgroundColor: "#096B72",
     paddingVertical: 12,
     paddingHorizontal: 24,
     borderRadius: 20,
@@ -168,7 +168,7 @@ create: {
   },
 
   proceedButton: {
-    backgroundColor: "#020eba",
+    backgroundColor: "#096B72",
     paddingVertical: 12,
     paddingHorizontal: 24,
     borderRadius: 20,
@@ -180,7 +180,7 @@ create: {
   },
 
   registerButton:{
-    backgroundColor: "#020eba",
+    backgroundColor: "#096B72",
     paddingVertical: 12,
     paddingHorizontal: 24,
     borderRadius: 20,
@@ -224,7 +224,7 @@ create: {
   },
 
   fbButton: {
-    backgroundColor: "#020eba",
+    backgroundColor: "#096B72",
     paddingVertical: 12,
     paddingHorizontal: 24,
     borderRadius: 20,

@@ -85,7 +85,7 @@ export default function Kyc() {
         <View style={styles.container}>
           <View style={styles.imageContainer}>
             <ImageBackground
-              source={require("../assets/images/Blob.png")}
+              source={require("../assets/images/blob1.png")}
               style={styles.imageBg}
               resizeMode="stretch"
             />
@@ -200,8 +200,8 @@ export default function Kyc() {
 
             <View style={styles.bottom}>
               <Text style={styles.bot}>ALREADY HAVE AN ACCOUNT? </Text>
-              <Link href="/signup" style={[styles.bot, styles.italic]}>
-                SIGN UP
+              <Link href="/login" style={[styles.bot, styles.italic]}>
+                LOG IN
               </Link>
             </View>
           </ScrollView>

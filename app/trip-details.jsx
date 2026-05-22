@@ -148,7 +148,7 @@ heading: {
   title: {
     fontSize: 34,
     fontWeight: "bold",
-    color: "#096B72",
+    color: "#020eba",
   },
   text: {
     fontSize: 18,

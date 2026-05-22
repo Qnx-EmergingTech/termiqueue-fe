@@ -137,7 +137,7 @@ export default function Terminals() {
       <Stack.Screen
         options={{
           headerShown: true,
-          headerTitle: "Please select a bus",
+          headerTitle: "Please select a shuttle",
           headerTransparent: false,
           headerBackTitleVisible: false,
           headerBackVisible: false,

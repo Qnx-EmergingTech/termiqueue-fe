@@ -163,7 +163,7 @@ export default function TripHistory() {
                   >
                     <View style={styles.imageContainer}>
                       <Image
-                        source={require("../assets/images/location.png")}
+                        source={require("../assets/images/location1.png")}
                         style={styles.image}
                       />
 

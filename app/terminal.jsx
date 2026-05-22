@@ -137,7 +137,7 @@ export default function Terminals() {
       <Stack.Screen
         options={{
           headerShown: true,
-          headerTitle: "Please select a bus",
+          headerTitle: "Please select a shuttle",
           headerTransparent: false,
           headerBackTitleVisible: false,
           headerBackVisible: false,
@@ -175,7 +175,7 @@ export default function Terminals() {
             <Pressable key={terminal.id} onPress={() => handleJoinQueue(terminal.id)}>
               <View style={styles.imageContainer}>
                 <Image
-                  source={require("../assets/images/location.png")}
+                  source={require("../assets/images/location1.png")}
                   style={styles.image}
                   resizeMode="contain"
                 />
@@ -260,7 +260,7 @@ const styles = StyleSheet.create({
     color: "#A1A4B2",
   },
   inQueueText: {
-    color: "#59A96A",
+    color: "#020eba",
     fontWeight: "600",
   },
   scrollContent: {
@@ -273,7 +273,7 @@ const styles = StyleSheet.create({
   width: Dimensions.get("window").width * 0.85,
   backgroundColor: "white",
   borderWidth: 1,
-  borderColor: "#096B72",
+  borderColor: "#020eba",
   paddingVertical: 14,
   borderRadius: 24,
   alignItems: "center",
@@ -281,6 +281,6 @@ const styles = StyleSheet.create({
 returnHomeText: {
   fontSize: 16,
   fontFamily: "Roboto_500Medium",
-  color: "#096B72",
+  color: "#020eba",
 },
 });

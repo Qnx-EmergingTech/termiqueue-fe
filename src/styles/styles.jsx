@@ -102,57 +102,55 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
   },
 
-image: {
+  image: {
+    position: 'absolute',
+    top: 0,          
+    left: 0,
+    right: 0,
+    height: screenHeight * 0.6,
+    width: '100%'
+  },
+
+  headingOnImage: {
+    color: 'black',
+    fontSize: 16,
+    fontFamily: 'Roboto_700Bold',
+    letterSpacing: 4,
+    marginTop: 40,
+    textAlign: 'center',
+  },
+
+  textSection: {
+    padding: 30,
+    alignSelf: 'center',
+    justifyContent: 'center',
+  },
+
+  imageBg: {
+    position: 'absolute',
+    top: 0,          
+    left: 0,
+    right: 0,
+    height: screenHeight * 0.45,
+    width: '100%'
+  },
+
+  welcome: {
+    position: 'absolute',
+    top: screenHeight * 0.2,
+    left: screenWidth * 0.085,
+    justifyContent: "center",
+    alignItems: "center",
+    width: screenWidth * 0.83,
+  },
+
+  create: {
   position: 'absolute',
-  top: 0,          
-  left: 0,
-  right: 0,
-  height: screenHeight * 0.6,
-  width:  '100%'
-},
-
-headingOnImage: {
-  color: 'black',
-  fontSize: 16,
-  fontFamily: 'Roboto_700Bold',
-  letterSpacing: 4,
-  marginTop: 40,
-  textAlign: 'center',
-},
-
-textSection: {
-  padding: 30,
-  alignSelf: 'center',
-  justifyContent: 'center',
-},
-
-imageBg: {
-  position: 'absolute',
-  top: 0,          
-  left: 0,
-  right: 0,
-  height: screenHeight * 0.45,
-  width:  '100%'
-},
-
-welcome: {
-  position: 'absolute',
-  top: screenHeight * 0.2,    
-  left: '21%',                 
-  transform: [{ translateX: -50 }, { translateY: -10 }],
+  top: screenHeight * 0.2,
+  left: screenWidth * 0.085,
   justifyContent: "center",
   alignItems: "center",
-  width: screenWidth * 0.85,
-},
-
-create: {
-  position: 'absolute',
-  top: screenHeight * 0.13,    
-  left: screenWidth * 0.21,                
-  transform: [{ translateX: -50 }, { translateY: -10 }],
-  justifyContent: "center",
-  alignItems: "center",
-  width: screenWidth * 0.82,
+  width: screenWidth * 0.83,
 },
 
   loginButton: {
@@ -179,7 +177,7 @@ create: {
     alignSelf: "center",
   },
 
-  registerButton:{
+  registerButton: {
     backgroundColor: "#020eba",
     paddingVertical: 12,
     paddingHorizontal: 24,
@@ -246,12 +244,12 @@ create: {
   },
 
   error: {
-  color: "#e63946",        
-  marginTop: 10,
-  fontSize: 14,
-  fontFamily: "RobotoMono_500Medium",
-  textAlign: "center",
-},
+    color: "#e63946",        
+    marginTop: 10,
+    fontSize: 14,
+    fontFamily: "RobotoMono_500Medium",
+    textAlign: "center",
+  },
 
   logo: {
     width: 79,

@@ -3,7 +3,7 @@ import { Link, Stack, useRouter } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { getIdToken, signInWithEmailAndPassword } from "firebase/auth";
 import { useState, useEffect } from "react";
-import { Image, Pressable, Text, TextInput, View, Platform, KeyboardAvoidingView, TouchableWithoutFeedback, ScrollView, Keyboard} from "react-native";
+import { Alert, Image, Pressable, Text, TextInput, View, Platform, KeyboardAvoidingView, TouchableWithoutFeedback, ScrollView, Keyboard } from "react-native";
 import { auth } from "../firebaseConfig";
 import styles from "../src/styles/styles";
 import { setToken } from "../src/utils/authStorage";
@@ -14,7 +14,6 @@ SplashScreen.preventAutoHideAsync();
 export default function Login() {
   const router = useRouter();
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
   const [username, setUsername] = useState("");
   const [keyboardVisible, setKeyboardVisible] = useState(false);
 
@@ -30,11 +29,21 @@ export default function Login() {
     };
   }, []);
 
+  const firebaseErrorMessage = (code) => {
+    switch (code) {
+      case "auth/user-not-found": return "No account found with this username.";
+      case "auth/wrong-password": return "Incorrect password.";
+      case "auth/invalid-credential": return "Invalid username or password.";
+      case "auth/user-disabled": return "This account has been disabled.";
+      case "auth/too-many-requests": return "Too many failed attempts. Please try again later.";
+      case "auth/network-request-failed": return "Network error. Please check your connection.";
+      default: return "Login failed. Please try again.";
+    }
+  };
+
   const handleLogin = async () => {
-    setError("");
     if (!username.trim() || !password) {
-      setError("Username and password are required.");
-      return;
+      return Alert.alert("Error", "Username and password are required.");
     }
 
     try {
@@ -46,13 +55,13 @@ export default function Login() {
 
       if (!res.ok) {
         const data = await res.json();
-        throw new Error(data.detail || "Invalid username or password");
+        throw new Error(data.detail || "Invalid username or password.");
       }
 
       const data = await res.json();
       const email = data.email;
 
-      if (!email) throw new Error("Email not found for this username");
+      if (!email) throw new Error("Email not found for this username.");
 
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
@@ -77,16 +86,11 @@ export default function Login() {
       router.replace("/home");
     } catch (err) {
       console.log(err);
-      setError(err.message || "Login failed");
+      const message = err.code
+        ? firebaseErrorMessage(err.code)
+        : err.message || "Login failed. Please try again.";
+      Alert.alert("Error", message);
     }
-  };
-
-  const handleFacebook = () => {
-    console.log("Signup pressed");
-  };
-
-  const handleGoogle = () => {
-    console.log("Signup pressed");
   };
 
   return (
@@ -102,80 +106,74 @@ export default function Login() {
 
       <KeyboardAvoidingView
         style={{ flex: 1 }}
-        behavior={Platform.OS === "android" ? "height" : "padding"}
-        keyboardVerticalOffset={Platform.OS === "android" ? 25 : 0}
+        behavior="padding"
+        keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0}
       >
-         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <ScrollView
-          contentContainerStyle={{ flexGrow: 1 }}
-          keyboardShouldPersistTaps="handled"
-        >
-      <View style={styles.container}>
-        <View style={styles.imageContainer}>
-          <Image
-            source={require('../assets/images/blob1.png')}
-            style={styles.imageBg}
-            resizeMode="stretch"
-          />
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <ScrollView
+            contentContainerStyle={{ flexGrow: 1 }}
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
+          >
+            <View style={styles.container}>
+              <View style={styles.imageContainer}>
+                <Image
+                  source={require('../assets/images/blob1.png')}
+                  style={styles.imageBg}
+                  resizeMode="stretch"
+                />
 
-          <View style={styles.welcome}>
-            <Text style={styles.heading}>Welcome Back!</Text>
+                <View style={styles.welcome}>
+                  <Image
+                    source={require('../assets/images/logo1.png')}
+                    style={[styles.logo, { width: 100, height: 100, marginTop: 0 }]}
+                    resizeMode="contain"
+                  />
+                  {!keyboardVisible && (
+                    <Text style={styles.heading}>Welcome Back!</Text>
+                  )}
+                </View>
+              </View>
 
-          {!keyboardVisible && (
-            <View style={{ width: '100%' }}>
-            <Pressable style={styles.fbButton} onPress={handleFacebook}>
-              <Text style={styles.loginText}>CONTINUE WITH FACEBOOK</Text>
-            </Pressable>
+              <View style={styles.field}>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Username"
+                  placeholderTextColor="#A1A4B2"
+                  autoCapitalize="none"
+                  value={username}
+                  onChangeText={setUsername}
+                />
+              </View>
 
-            <Pressable style={styles.gButton} onPress={handleGoogle}>
-              <Text style={styles.buttonText}>CONTINUE WITH GOOGLE</Text>
-            </Pressable>
+              <View style={styles.field}>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Enter your password"
+                  placeholderTextColor="#A1A4B2"
+                  secureTextEntry
+                  value={password}
+                  onChangeText={setPassword}
+                />
+              </View>
+
+              <Pressable style={styles.loginButton} onPress={handleLogin}>
+                <Text style={styles.loginText}>LOG IN</Text>
+              </Pressable>
+
+              <View style={styles.field}>
+                <Text style={styles.fp}>Forgot Password?</Text>
+              </View>
+
+              <View style={styles.bottom}>
+                <Text style={styles.bot}>ALREADY HAVE AN ACCOUNT? </Text>
+                <Link href="/signup" style={[styles.bot, styles.italic]}>
+                  SIGN UP
+                </Link>
+              </View>
             </View>
-          )}
-          </View>
-        </View>
-
-        <View style={styles.field}>
-          <TextInput
-            style={styles.input}
-            placeholder="Username"
-            placeholderTextColor="#A1A4B2"
-            autoCapitalize="none"
-            value={username}
-            onChangeText={setUsername}
-          />
-        </View>
-
-        <View style={styles.field}>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter your password"
-            placeholderTextColor="#A1A4B2"
-            secureTextEntry
-            value={password}
-            onChangeText={setPassword}
-          />
-        </View>
-
-        {error ? <Text style={styles.error}>{error}</Text> : null}
-
-        <Pressable style={styles.loginButton} onPress={handleLogin}>
-          <Text style={styles.loginText}>LOG IN</Text>
-        </Pressable>
-
-        <View style={styles.field}>
-          <Text style={styles.fp}>Forgot Password?</Text>
-        </View>
-
-        <View style={styles.bottom}>
-          <Text style={styles.bot}>ALREADY HAVE AN ACCOUNT? </Text>
-          <Link href="/signup" style={[styles.bot, styles.italic]}>
-            SIGN UP
-          </Link>
-        </View>
-      </View>
-      </ScrollView>
-      </TouchableWithoutFeedback>
+          </ScrollView>
+        </TouchableWithoutFeedback>
       </KeyboardAvoidingView>
     </>
   );

@@ -5,20 +5,21 @@ import { Stack, useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import { ActivityIndicator, Alert, Pressable, Text, View, ScrollView, RefreshControl } from "react-native";
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
-import { Menu, Provider as PaperProvider } from 'react-native-paper';
+import { Menu } from 'react-native-paper';
 import { auth } from "../firebaseConfig";
 import hstyles from "../src/styles/homeStyles";
+import { getValidToken } from "../src/utils/authStorage";
 
 export default function Home() {
   const router = useRouter();
   const [region, setRegion] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [isLoadingMap, setIsLoadingMap] = useState(true); 
+  const [isLoadingMap, setIsLoadingMap] = useState(true);
   const [geofenceStatus, setGeofenceStatus] = useState(null);
   const [firstName, setFirstName] = useState("");
   const [inRange, setInRange] = useState(false);
   const [menuVisible, setMenuVisible] = useState(false);
-  const [currentQueue, setCurrentQueue] = useState(null); 
+  const [currentQueue, setCurrentQueue] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
 
   const apiUrl = process.env.EXPO_PUBLIC_API_BASE_URL;
@@ -33,13 +34,13 @@ export default function Home() {
         "firebaseIdToken",
         "userId",
         "isLoggedIn",
-        "currentQueueId" 
+        "currentQueueId"
       ]);
-      
+
       console.log('✅ Auth cleared from AsyncStorage');
-      
+
       await auth.signOut();
-      
+
       router.replace("/login");
     } catch (error) {
       console.error('Logout error:', error);
@@ -48,7 +49,7 @@ export default function Home() {
 
   const fetchProfile = useCallback(async () => {
     try {
-      const token = await AsyncStorage.getItem("firebaseIdToken");
+      const token = await getValidToken();
       if (!token) return;
       const response = await fetch(`${apiUrl}/profiles/me`, {
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
@@ -63,7 +64,7 @@ export default function Home() {
 
   const fetchCurrentQueue = useCallback(async () => {
     try {
-      const token = await AsyncStorage.getItem("firebaseIdToken");
+      const token = await getValidToken();
       const queueId = await AsyncStorage.getItem("currentQueueId");
 
       if (!token || !queueId) {
@@ -174,162 +175,162 @@ export default function Home() {
   };
 
   return (
-    <PaperProvider>
+    <>
       <Stack.Screen options={{ headerShown: false }} />
 
-       <ScrollView
+      <ScrollView
         contentContainerStyle={{ flexGrow: 1 }}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
-        }>
+        }
+      >
+        <View style={hstyles.container}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', marginBottom: 10 }}>
+            <View style={{ flex: 1 }}>
+              <Text style={hstyles.greeting}>Hello, {firstName}!</Text>
+              <Text style={hstyles.title}>Ready to queue for your next ride?</Text>
+            </View>
 
-      <View style={hstyles.container}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', marginBottom: 10 }}>
-          <View style={{ flex: 1 }}>
-            <Text style={hstyles.greeting}>Hello, {firstName}!</Text>
-            <Text style={hstyles.title}>Ready to queue for your next ride?</Text>
+            <Menu
+              visible={menuVisible}
+              onDismiss={closeMenu}
+              contentStyle={{
+                backgroundColor: "white",
+                borderRadius: 5,
+              }}
+              anchor={
+                <Pressable onPress={openMenu} style={{ padding: 10 }}>
+                  <Ionicons name="ellipsis-vertical" size={24} color="#A1A4B2" />
+                </Pressable>
+              }
+            >
+              <Menu.Item
+                onPress={() => {
+                  closeMenu();
+                  router.push("/trip-history");
+                }}
+                title="Trip History"
+                leadingIcon={() => (
+                  <Ionicons name="time-outline" size={24} color="#333" />
+                )}
+                titleStyle={{
+                  fontFamily: "Roboto_500Medium",
+                  fontSize: 16,
+                  color: "#333",
+                }}
+                style={{
+                  paddingVertical: 10,
+                  paddingHorizontal: 10,
+                }}
+              />
+              <Menu.Item
+                onPress={handleLogout}
+                title="Logout"
+                leadingIcon={() => (
+                  <Ionicons name="log-out-outline" size={24} color="#DB5461" />
+                )}
+                titleStyle={{
+                  fontFamily: "Roboto_500Medium",
+                  fontSize: 16,
+                  color: "#333",
+                }}
+                style={{
+                  paddingVertical: 10,
+                  paddingHorizontal: 10,
+                }}
+              />
+            </Menu>
           </View>
 
-          <Menu
-            visible={menuVisible}
-            onDismiss={closeMenu}
-            contentStyle={{
-              backgroundColor: "white",
-              borderRadius: 5,
-            }}
-            anchor={
-              <Pressable onPress={openMenu} style={{ padding: 10 }}>
-                <Ionicons name="ellipsis-vertical" size={24} color="#A1A4B2" />
-              </Pressable>
-            }
-          >
-            <Menu.Item
-              onPress={() => {
-                closeMenu();
-                router.push("/trip-history");
-              }}
-              title="Trip History"
-              leadingIcon={() => (
-                <Ionicons name="time-outline" size={24} color="#333" />
-              )}
-              titleStyle={{
-                fontFamily: "Roboto_500Medium",
-                fontSize: 16,
-                color: "#333",
-              }}
-              style={{
-                paddingVertical: 10,
-                paddingHorizontal: 10,
-              }}
-            />
-            <Menu.Item
-              onPress={handleLogout}
-              title="Logout"
-              leadingIcon={() => (
-                <Ionicons name="log-out-outline" size={24} color="#DB5461" />
-              )}
-              titleStyle={{
-                fontFamily: "Roboto_500Medium",
-                fontSize: 16,
-                color: "#333",
-              }}
-              style={{
-                paddingVertical: 10,
-                paddingHorizontal: 10,
-              }}
-            />
-          </Menu>
-        </View>
+          {isLoadingMap ? (
+            <View style={[hstyles.map, { justifyContent: 'center', alignItems: 'center', backgroundColor: '#f0f0f0' }]}>
+              <ActivityIndicator size="large" color="#096B72" />
+              <Text style={{ marginTop: 10, color: '#666' }}>Loading map...</Text>
+            </View>
+          ) : region ? (
+            <MapView
+              provider={PROVIDER_GOOGLE}
+              style={hstyles.map}
+              initialRegion={region}
+              showsUserLocation
+              showsMyLocationButton
+              onMapReady={() => console.log('✅ Map is ready')}
+              onError={(error) => console.log('❌ Map error:', error)}
+              onMapLoaded={() => console.log('✅ Map loaded successfully')}
+            >
+              <Marker coordinate={region} title="You are here" />
+            </MapView>
+          ) : (
+            <View style={[hstyles.map, { justifyContent: 'center', alignItems: 'center', backgroundColor: '#f0f0f0' }]}>
+              <Text style={{ color: '#666' }}>Unable to load map</Text>
+            </View>
+          )}
 
-        {isLoadingMap ? (
-          <View style={[hstyles.map, { justifyContent: 'center', alignItems: 'center', backgroundColor: '#f0f0f0' }]}>
-            <ActivityIndicator size="large" color="#096B72" />
-            <Text style={{ marginTop: 10, color: '#666' }}>Loading map...</Text>
-          </View>
-        ) : region ? (
-          <MapView
-            provider={PROVIDER_GOOGLE}
-            style={hstyles.map}
-            initialRegion={region} 
-            showsUserLocation
-            showsMyLocationButton
-            onMapReady={() => console.log('✅ Map is ready')}
-            onError={(error) => console.log('❌ Map error:', error)}
-            onMapLoaded={() => console.log('✅ Map loaded successfully')}
-          >
-            <Marker coordinate={region} title="You are here" />
-          </MapView>
-        ) : (
-          <View style={[hstyles.map, { justifyContent: 'center', alignItems: 'center', backgroundColor: '#f0f0f0' }]}>
-            <Text style={{ color: '#666' }}>Unable to load map</Text>
-          </View>
-        )}
-
-        {isLoading ? (
-          <ActivityIndicator size="large" color="#020eba" style={{ marginTop: 10 }} />
-        ) : (
-          <>
-            {geofenceStatus?.can_join ? (
-              <>
-                <Text style={[hstyles.out, { color: "#020eba" }]}>In Range!</Text>
-                <Text style={hstyles.outtext}>You are within the queueing area, please select your bus to queue.</Text>
-              </>
-            ) : (
-              <>
-                <Text style={hstyles.out}>Out of range!</Text>
-                <Text style={hstyles.outtext}>
-                  You are currently out of range, please go near the One Ayala terminal.
-                </Text>
-              </>
-            )}
-          </>
-        )}
-
-        <View style={hstyles.try}>
-          <Pressable
-            onPress={handleProceed}
-            disabled={!currentQueue && !inRange} 
-            style={[
-              hstyles.proceedButton,
-              { backgroundColor: (currentQueue || inRange) ? "#333242" : "#8C8C8C" }, 
-            ]}
-          >
-            <View style={hstyles.textContainer}>
-              {currentQueue !== null ? (
+          {isLoading ? (
+            <ActivityIndicator size="large" color="#020eba" style={{ marginTop: 10 }} />
+          ) : (
+            <>
+              {geofenceStatus?.can_join ? (
                 <>
-                  <Text style={hstyles.btitle}>
-                    {currentQueue.destination}
-                  </Text>
-                  <Text style={hstyles.stitle}>
-                    Ticket # {currentQueue.queueNumber} • {currentQueue.status}
-                    {currentQueue.status === "waiting"
-                      ? " for bus arrival"
-                      : currentQueue.status === "boarded"
-                      ? ", waiting for departure"
-                      : ""}
-                  </Text>
+                  <Text style={[hstyles.out, { color: "#020eba" }]}>In Range!</Text>
+                  <Text style={hstyles.outtext}>You are within the queueing area, please select your bus to queue.</Text>
                 </>
               ) : (
                 <>
-                  <Text style={hstyles.btitle}>
-                    No terminal selected yet
-                  </Text>
-                  <Text style={hstyles.stitle}>
-                    Please select a terminal
+                  <Text style={hstyles.out}>Out of range!</Text>
+                  <Text style={hstyles.outtext}>
+                    You are currently out of range, please go near the One Ayala terminal.
                   </Text>
                 </>
               )}
-            </View>
-            <Ionicons
-              name="chevron-forward"
-              size={24}
-              color="white"
-              style={hstyles.icon}
-            />
-          </Pressable>
+            </>
+          )}
+
+          <View style={hstyles.try}>
+            <Pressable
+              onPress={handleProceed}
+              disabled={!currentQueue && !inRange}
+              style={[
+                hstyles.proceedButton,
+                { backgroundColor: (currentQueue || inRange) ? "#333242" : "#8C8C8C" },
+              ]}
+            >
+              <View style={hstyles.textContainer}>
+                {currentQueue !== null ? (
+                  <>
+                    <Text style={hstyles.btitle}>
+                      {currentQueue.destination}
+                    </Text>
+                    <Text style={hstyles.stitle}>
+                      Ticket # {currentQueue.queueNumber} • {currentQueue.status}
+                      {currentQueue.status === "waiting"
+                        ? " for bus arrival"
+                        : currentQueue.status === "boarded"
+                        ? ", waiting for departure"
+                        : ""}
+                    </Text>
+                  </>
+                ) : (
+                  <>
+                    <Text style={hstyles.btitle}>
+                      No terminal selected yet
+                    </Text>
+                    <Text style={hstyles.stitle}>
+                      Please select a terminal
+                    </Text>
+                  </>
+                )}
+              </View>
+              <Ionicons
+                name="chevron-forward"
+                size={24}
+                color="white"
+                style={hstyles.icon}
+              />
+            </Pressable>
+          </View>
         </View>
-      </View>
       </ScrollView>
-    </PaperProvider>
+    </>
   );
 }

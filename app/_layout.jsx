@@ -21,7 +21,7 @@ import { useFonts } from "expo-font";
 import { Stack, router } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useCallback, useEffect, useState } from "react";
-
+import { Provider as PaperProvider } from 'react-native-paper';
 import SafeScreen from "../components/SafeScreen";
 import { auth } from "../firebaseConfig";
 import { getIdToken } from "firebase/auth";
@@ -124,15 +124,19 @@ export default function RootLayout() {
 
   if (!fontsLoaded || isCheckingAuth) {
     return (
+      <PaperProvider>
       <SafeScreen onLayout={onLayoutRootView}>
         <Stack />
       </SafeScreen>
+      </PaperProvider>
     );
   }
 
   return (
+   <PaperProvider>
     <SafeScreen onLayout={onLayoutRootView}>
       <Stack screenOptions={{ headerShown: true }} />
     </SafeScreen>
+    </PaperProvider>
   );
 }

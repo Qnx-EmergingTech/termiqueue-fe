@@ -1,5 +1,4 @@
 import { Ionicons } from "@expo/vector-icons";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Stack, useRouter } from "expo-router";
 import { useEffect, useState, useMemo, useCallback } from "react";
 import {
@@ -13,6 +12,7 @@ import {
   TextInput,
   View,
 } from "react-native";
+import { getValidToken } from "../src/utils/authStorage";
 
 export default function TripHistory() {
   const router = useRouter();
@@ -23,32 +23,31 @@ export default function TripHistory() {
 
   const fetchTripHistory = useCallback(async () => {
     try {
-        const token = await AsyncStorage.getItem("firebaseIdToken");
+      const token = await getValidToken();
 
-         if (!token) {
-            Alert.alert("Error", "User not authenticated");
-            return;
-        }
+      if (!token) {
+        Alert.alert("Error", "User not authenticated");
+        return;
+      }
 
-        const response = await fetch(`${apiUrl}/profiles/me/trips/all`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+      const response = await fetch(`${apiUrl}/profiles/me/trips/all`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-        const data = await response.json();
-
-        setTrips(Array.isArray(data?.trips) ? data.trips : []);
+      const data = await response.json();
+      setTrips(Array.isArray(data?.trips) ? data.trips : []);
     } catch (error) {
-        console.error("Error fetching trip history:", error);
+      console.error("Error fetching trip history:", error);
     }
- }, [apiUrl]);
+  }, [apiUrl]);
 
-    useEffect(() => {
-        fetchTripHistory();
-    }, [fetchTripHistory]);
+  useEffect(() => {
+    fetchTripHistory();
+  }, [fetchTripHistory]);
 
-    const isToday = (date) => {
+  const isToday = (date) => {
     const today = new Date();
     return date.toDateString() === today.toDateString();
   };
@@ -76,7 +75,7 @@ export default function TripHistory() {
     });
   };
 
-    const groupedTrips = useMemo(() => {
+  const groupedTrips = useMemo(() => {
     const filtered = trips.filter((trip) =>
       trip.destination.toLowerCase().includes(searchQuery.toLowerCase())
     );
@@ -101,10 +100,10 @@ export default function TripHistory() {
     return groups;
   }, [trips, searchQuery]);
 
-    const sortedDates = Object.keys(groupedTrips).sort(
+  const sortedDates = Object.keys(groupedTrips).sort(
     (a, b) => new Date(b) - new Date(a)
   );
-    
+
   return (
     <>
       <Stack.Screen
@@ -259,10 +258,10 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
   },
   dateHeader: {
-  fontSize: 14,
-  fontFamily: "Roboto_500Medium",
-  color: "#6B7280",
-  marginTop: 20,
-  marginBottom: 10,
-},
+    fontSize: 14,
+    fontFamily: "Roboto_500Medium",
+    color: "#6B7280",
+    marginTop: 20,
+    marginBottom: 10,
+  },
 });

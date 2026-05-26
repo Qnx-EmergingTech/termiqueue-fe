@@ -2,7 +2,7 @@ import { View, Text, StyleSheet, Pressable, ActivityIndicator } from 'react-nati
 import React, { useEffect, useState } from 'react';
 import { Stack, useRouter, useLocalSearchParams} from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getValidToken } from "../src/utils/authStorage";
 
 export default function TripDetails() {
 
@@ -17,7 +17,7 @@ const apiUrl = process.env.EXPO_PUBLIC_API_BASE_URL;
 useEffect(() => {
     const fetchTripDetails = async () => {
       try {
-        const token = await AsyncStorage.getItem("firebaseIdToken");
+        const token = await getValidToken();
 
         const response = await fetch(
           `${apiUrl}/profiles/me/trips/${trip_id}`,

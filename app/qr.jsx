@@ -5,6 +5,7 @@ import { ActivityIndicator, Dimensions, Image, Pressable, Text, View } from "rea
 import QRCode from 'react-native-qrcode-svg';
 import qrstyles from "../src/styles/qrStyles";
 import { jwtDecode } from "jwt-decode";
+import { getValidToken } from "../src/utils/authStorage";
 
 export default function Qr() {
   const router = useRouter();
@@ -23,9 +24,9 @@ export default function Qr() {
   const wsRef = useRef(null);
   const pollRef = useRef(null);
 
- useEffect(() => {
+  useEffect(() => {
     const initUserId = async () => {
-      const token = await AsyncStorage.getItem("firebaseIdToken");
+      const token = await getValidToken();
       if (!token) return;
 
       const decoded = jwtDecode(token);
@@ -40,7 +41,7 @@ export default function Qr() {
 
   const fetchQueueDetails = useCallback(async () => {
     try {
-      const token = await AsyncStorage.getItem("firebaseIdToken");
+      const token = await getValidToken();
 
       const response = await fetch(
         `${apiUrl}/queues/${queueId}/me/status`,
@@ -112,13 +113,13 @@ export default function Qr() {
     if (queueId) fetchQueueDetails();
   }, [queueId, fetchQueueDetails]);
 
-useEffect(() => {
+  useEffect(() => {
     if (!queueId || !userId) return;
 
     let ws;
 
     const connectWS = async () => {
-      const token = await AsyncStorage.getItem("firebaseIdToken");
+      const token = await getValidToken();
       if (!token) return;
 
       const wsUrl = `${apiUrl.replace(
@@ -159,7 +160,7 @@ useEffect(() => {
 
     const startPolling = async () => {
       pollRef.current = setInterval(async () => {
-        const token = await AsyncStorage.getItem("firebaseIdToken");
+        const token = await getValidToken();
         const res = await fetch(
           `${apiUrl}/queues/${queueId}/me/status`,
           { headers: { Authorization: `Bearer ${token}` } }
@@ -223,9 +224,9 @@ useEffect(() => {
 
   const handleLeaveQueue = (terminalId) => {
     if (wsRef.current) {
-    wsRef.current.close();
-    wsRef.current = null;
-   }
+      wsRef.current.close();
+      wsRef.current = null;
+    }
 
     router.push({
       pathname: "/cancelModal",
@@ -297,11 +298,6 @@ useEffect(() => {
           />
           <Text style={qrstyles.info}>{queue.destination}</Text>
         </View>
-
-        {/* <View style={qrstyles.textContainer}>
-          <Text style={qrstyles.info}>Your Status - </Text>
-          <Text style={qrstyles.info}>{queue.status || "waiting"}</Text>
-        </View> */}
 
         <View style={qrstyles.textContainer}>
           <Text style={qrstyles.info}>Ticket number </Text>

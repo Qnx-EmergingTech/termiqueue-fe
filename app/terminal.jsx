@@ -13,6 +13,7 @@ import {
   TextInput,
   View,
 } from "react-native";
+import { getValidToken } from "../src/utils/authStorage";
 
 export default function Terminals() {
   const router = useRouter();
@@ -34,13 +35,13 @@ export default function Terminals() {
     };
 
     if (apiUrl) {
-    fetchTerminals();
+      fetchTerminals();
     }
   }, [apiUrl]);
 
   const handleJoinQueue = async (terminalId) => {
     try {
-      const token = await AsyncStorage.getItem("firebaseIdToken");
+      const token = await getValidToken();
       if (!token) {
         Alert.alert("Error", "You must be logged in to join a queue.");
         return;
@@ -181,7 +182,6 @@ export default function Terminals() {
                 />
                 <View style={styles.textContainer}>
                   <Text style={styles.title}>{terminal.destination}</Text>
-
                   <Text
                     style={[
                       styles.subtitle,
@@ -267,20 +267,20 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
   returnHomeButton: {
-  position: "absolute",
-  bottom: 30,
-  alignSelf: "center",
-  width: Dimensions.get("window").width * 0.85,
-  backgroundColor: "white",
-  borderWidth: 1,
-  borderColor: "#020eba",
-  paddingVertical: 14,
-  borderRadius: 24,
-  alignItems: "center",
-},
-returnHomeText: {
-  fontSize: 16,
-  fontFamily: "Roboto_500Medium",
-  color: "#020eba",
-},
+    position: "absolute",
+    bottom: 30,
+    alignSelf: "center",
+    width: Dimensions.get("window").width * 0.85,
+    backgroundColor: "white",
+    borderWidth: 1,
+    borderColor: "#020eba",
+    paddingVertical: 14,
+    borderRadius: 24,
+    alignItems: "center",
+  },
+  returnHomeText: {
+    fontSize: 16,
+    fontFamily: "Roboto_500Medium",
+    color: "#020eba",
+  },
 });

@@ -12,6 +12,7 @@ import {
   TouchableWithoutFeedback,
   View
 } from 'react-native';
+import { getValidToken } from '../src/utils/authStorage';
 
 export default function CancelModal() {
   const router = useRouter();
@@ -27,7 +28,7 @@ export default function CancelModal() {
 
   const handleConfirm = async () => {
     try {
-      const token = await AsyncStorage.getItem("firebaseIdToken");
+      const token = await getValidToken();
       if (!token) {
         Alert.alert("Error", "No authentication token found");
         return;
@@ -49,7 +50,7 @@ export default function CancelModal() {
       }
 
       await AsyncStorage.removeItem("currentQueueId");
-      Alert.alert("Success", "You’ve left the queue.");
+      Alert.alert("Success", "You've left the queue.");
 
       setVisible(false);
       router.replace("/terminal");

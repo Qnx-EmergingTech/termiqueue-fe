@@ -3,7 +3,7 @@ import { Link, Stack, useRouter } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { getIdToken, signInWithEmailAndPassword } from "firebase/auth";
 import { useState, useEffect } from "react";
-import { Alert, Image, Pressable, Text, TextInput, View, Platform, KeyboardAvoidingView, TouchableWithoutFeedback, ScrollView, Keyboard } from "react-native";
+import { ActivityIndicator, Alert, Image, Pressable, Text, TextInput, View, Platform, KeyboardAvoidingView, TouchableWithoutFeedback, ScrollView, Keyboard } from "react-native";
 import { auth } from "../firebaseConfig";
 import styles from "../src/styles/styles";
 import { setToken } from "../src/utils/authStorage";
@@ -16,8 +16,13 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
   const [keyboardVisible, setKeyboardVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const apiUrl = process.env.EXPO_PUBLIC_API_BASE_URL;
+
+  useEffect(() => {
+    SplashScreen.hideAsync();
+  }, []);
 
   useEffect(() => {
     const showSub = Keyboard.addListener("keyboardDidShow", () => setKeyboardVisible(true));
@@ -46,6 +51,7 @@ export default function Login() {
       return Alert.alert("Error", "Username and password are required.");
     }
 
+    setLoading(true);
     try {
       const res = await fetch(`${apiUrl}/profiles/login`, {
         method: "POST",
@@ -90,6 +96,8 @@ export default function Login() {
         ? firebaseErrorMessage(err.code)
         : err.message || "Login failed. Please try again.";
       Alert.alert("Error", message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -126,7 +134,7 @@ export default function Login() {
                 <View style={styles.welcome}>
                   <Image
                     source={require('../assets/images/logo1.png')}
-                    style={[styles.logo, { width: 100, height: 100, marginTop: 0 }]}
+                    style={[styles.logo, { width: 100, height: 100, marginTop: -20 }]}
                     resizeMode="contain"
                   />
                   {!keyboardVisible && (
@@ -143,6 +151,7 @@ export default function Login() {
                   autoCapitalize="none"
                   value={username}
                   onChangeText={setUsername}
+                  editable={!loading}
                 />
               </View>
 
@@ -154,15 +163,23 @@ export default function Login() {
                   secureTextEntry
                   value={password}
                   onChangeText={setPassword}
+                  editable={!loading}
                 />
               </View>
 
-              <Pressable style={styles.loginButton} onPress={handleLogin}>
-                <Text style={styles.loginText}>LOG IN</Text>
+              <Pressable
+                style={[styles.loginButton, loading && { opacity: 0.7 }]}
+                onPress={handleLogin}
+                disabled={loading}
+              >
+                {loading
+                  ? <ActivityIndicator color="white" />
+                  : <Text style={styles.loginText}>LOG IN</Text>
+                }
               </Pressable>
 
               <View style={styles.field}>
-                <Text style={styles.fp}>Forgot Password?</Text>
+                <Text style={styles.fp} onPress={() => router.push("/forget-password")}>Forgot Password?</Text>
               </View>
 
               <View style={styles.bottom}>

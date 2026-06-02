@@ -3,7 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Location from 'expo-location';
 import { Stack, useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
-import { ActivityIndicator, Alert, Pressable, Text, View, ScrollView, RefreshControl } from "react-native";
+import { ActivityIndicator, Alert, Pressable, Text, View, ScrollView, RefreshControl, Platform } from "react-native";
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import { Menu } from 'react-native-paper';
 import { auth } from "../firebaseConfig";
@@ -249,7 +249,7 @@ export default function Home() {
             </View>
           ) : region ? (
             <MapView
-              provider={PROVIDER_GOOGLE}
+              provider={Platform.OS === 'android' ? PROVIDER_GOOGLE : null}
               style={hstyles.map}
               initialRegion={region}
               showsUserLocation

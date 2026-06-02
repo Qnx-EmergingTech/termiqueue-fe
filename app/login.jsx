@@ -131,16 +131,16 @@ export default function Login() {
                   resizeMode="stretch"
                 />
 
+                {!keyboardVisible && (
                 <View style={styles.welcome}>
                   <Image
                     source={require('../assets/images/logo1.png')}
                     style={[styles.logo, { width: 100, height: 100, marginTop: -20 }]}
                     resizeMode="contain"
                   />
-                  {!keyboardVisible && (
                     <Text style={styles.heading}>Welcome Back!</Text>
-                  )}
                 </View>
+                )}
               </View>
 
               <View style={styles.field}>

@@ -13,6 +13,9 @@
       "bundleIdentifier": "com.questronix.termiqueue",
       "buildNumber": "1",
       "googleServicesFile": "./GoogleService-Info.plist",
+      "config": {
+          "googleMapsApiKey": "AIzaSyASS4Q4g2pSYeDwqpEnw97lJo1DbzdG2RY"
+      },
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "This app needs access to your location to show nearby terminals and track your trips.",
         "NSLocationAlwaysAndWhenInUseUsageDescription": "This app needs access to your location to show nearby terminals and track your trips.",

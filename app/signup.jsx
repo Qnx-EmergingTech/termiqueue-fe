@@ -113,17 +113,16 @@ export default function Signup() {
                   resizeMode="cover"
                 />
 
+                {!keyboardVisible && (
                 <View style={styles.welcome}>
                   <Image
                     source={require('../assets/images/logo1.png')}
                     style={[styles.logo, { width: 100, height: 100, marginTop: -20 }]}
                     resizeMode="contain"
                   />
-
-                  {!keyboardVisible && (
                     <Text style={styles.heading}>Create your account</Text>
-                  )}
                 </View>
+                 )}
               </View>
 
               <View style={styles.field}>

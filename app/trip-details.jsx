@@ -100,7 +100,7 @@ useEffect(() => {
         </View>
 
         <Text style={styles.subText}>
-          Departed: {formatTime(trip.departed_at)}
+          Trip Ended: {formatTime(trip.finished_at)}
         </Text>
 
         <View style={styles.details}>
@@ -120,7 +120,10 @@ useEffect(() => {
             Ticket Number: {trip.ticket_number}
           </Text>
           <Text style={styles.data}>
-           Boarded at: {formatTime(trip.boarded_at)}
+           Boarded: {formatTime(trip.boarded_at)}
+          </Text>
+          <Text style={styles.data}>
+           Departed: {formatTime(trip.departed_at)}
           </Text>
         </View>
 
@@ -146,7 +149,7 @@ heading: {
     alignItems: "center",
   },
   title: {
-    fontSize: 34,
+    fontSize: 26,
     fontWeight: "bold",
     color: "#020eba",
   },

@@ -307,6 +307,8 @@ export default function Home() {
                         ? " for bus arrival"
                         : currentQueue.status === "boarded"
                         ? ", waiting for departure"
+                        : currentQueue.status === "ongoing"
+                        ? ", trip in progress"
                         : ""}
                     </Text>
                   </>

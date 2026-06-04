@@ -249,7 +249,7 @@ export default function Home() {
             </View>
           ) : region ? (
             <MapView
-              provider={Platform.OS === 'android' ? PROVIDER_GOOGLE : null}
+              {...(Platform.OS === 'android' ? { provider: PROVIDER_GOOGLE } : {})}
               style={hstyles.map}
               initialRegion={region}
               showsUserLocation

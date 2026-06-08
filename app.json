@@ -22,8 +22,6 @@
         "NSCameraUsageDescription": "This app needs access to your camera to scan QR codes.",
         "UIBackgroundModes": [
           "location",
-          "remote-notification",
-          "location",
           "remote-notification"
         ],
         "ITSAppUsesNonExemptEncryption": false
@@ -61,7 +59,13 @@
           "androidNotificationChannelName": "Default Notifications"
         }
       ],
-      "expo-notifications",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/logoAPP.png",
+          "iosDisplayInForeground": true
+        }
+      ],
       [
         "expo-build-properties",
         {
@@ -85,7 +89,6 @@
         }
       ],
       "expo-font",
-      "expo-maps",
       "expo-web-browser"
     ],
     "experiments": {

@@ -22,8 +22,6 @@
         "NSCameraUsageDescription": "This app needs access to your camera to scan QR codes.",
         "UIBackgroundModes": [
           "location",
-          "remote-notification",
-          "location",
           "remote-notification"
         ],
         "ITSAppUsesNonExemptEncryption": false
@@ -33,8 +31,7 @@
       "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/images/android-icon-foreground.png",
-        "backgroundImage": "./assets/images/logoAPP.png",
+        "foregroundImage": "./assets/images/logoAPP.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "edgeToEdgeEnabled": true,
@@ -62,7 +59,13 @@
           "androidNotificationChannelName": "Default Notifications"
         }
       ],
-      "expo-notifications",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/logoAPP.png",
+          "iosDisplayInForeground": true
+        }
+      ],
       [
         "expo-build-properties",
         {
@@ -86,7 +89,6 @@
         }
       ],
       "expo-font",
-      "expo-maps",
       "expo-web-browser"
     ],
     "experiments": {

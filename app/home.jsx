@@ -188,7 +188,17 @@ export default function Home() {
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', marginBottom: 10 }}>
             <View style={{ flex: 1 }}>
               <Text style={hstyles.greeting}>Hello, {firstName}!</Text>
-              <Text style={hstyles.title}>Ready to queue for your next ride?</Text>
+              <Text style={hstyles.title}>
+                {currentQueue
+                  ? currentQueue.status === "waiting"
+                    ? "You're in queue, waiting for bus arrival."
+                  : currentQueue.status === "boarded"
+                    ? "You're boarded, waiting for departure."
+                  : currentQueue.status === "ongoing"
+                    ? "Your trip is in progress!"
+                  : "You're currently in queue."
+                  : "Ready to queue for your next ride?"}
+              </Text>
             </View>
 
             <Menu
@@ -249,7 +259,7 @@ export default function Home() {
             </View>
           ) : region ? (
             <MapView
-              provider={Platform.OS === 'android' ? PROVIDER_GOOGLE : null}
+              {...(Platform.OS === 'android' ? { provider: PROVIDER_GOOGLE } : {})}
               style={hstyles.map}
               initialRegion={region}
               showsUserLocation

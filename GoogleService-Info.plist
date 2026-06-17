@@ -2,18 +2,22 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>CLIENT_ID</key>
+	<string>565011913202-lit89po27qjtnt4pbgemg0pd77ep53ok.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.565011913202-lit89po27qjtnt4pbgemg0pd77ep53ok</string>
 	<key>API_KEY</key>
-	<string>AIzaSyASS4Q4g2pSYeDwqpEnw97lJo1DbzdG2RY</string>
+	<string>AIzaSyCUyRNe3vHTlrwan_5W3WtEos76iD_qrwk</string>
 	<key>GCM_SENDER_ID</key>
-	<string>655635157366</string>
+	<string>565011913202</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.questronix.qnext</string>
+	<string>com.qymera.qnext</string>
 	<key>PROJECT_ID</key>
-	<string>qnext-bc282</string>
+	<string>qnext-qnx</string>
 	<key>STORAGE_BUCKET</key>
-	<string>qnext-bc282.firebasestorage.app</string>
+	<string>qnext-qnx.firebasestorage.app</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -25,6 +29,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:655635157366:ios:cab4a54e24c21fbfc0aa57</string>
+	<string>1:565011913202:ios:1b3d1259af7a9c080f736b</string>
 </dict>
 </plist>

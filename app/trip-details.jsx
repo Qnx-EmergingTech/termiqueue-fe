@@ -88,14 +88,18 @@ useEffect(() => {
       <View style={styles.container}>
         <View style={styles.heading}>
           <View style={styles.tripRow}>
-            <Text style={styles.title}>{trip.origin}</Text>
+            <Text style={styles.title}>
+              {trip.origin}
+            </Text>
             <Ionicons
               name="arrow-forward"
               size={18}
               color="#096B72"
               style={{ marginHorizontal: 6 }}
             />
-            <Text style={styles.title}>{trip.destination}</Text>
+            <Text style={styles.title}>
+              {trip.destination}
+            </Text>
           </View>
         </View>
 
@@ -152,6 +156,7 @@ heading: {
     fontSize: 26,
     fontWeight: "bold",
     color: "#020eba",
+    flexShrink: 1,
   },
   text: {
     fontSize: 18,
@@ -166,6 +171,7 @@ heading: {
   tripRow: {
     flexDirection: "row",
     alignItems: "center",
+    flexWrap: "wrap",
   },
   subText: {
     fontSize: 16,
@@ -185,4 +191,4 @@ heading: {
     justifyContent: "center",
     alignItems: "center",
   },
-});
+});    

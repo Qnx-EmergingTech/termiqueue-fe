@@ -163,8 +163,7 @@ export default function TripHistory() {
                     <View style={styles.imageContainer}>
                       <Image
                         source={require("../assets/images/location1.png")}
-                        style={styles.image}
-                      />
+                        style={styles.image}/>
 
                       <View style={styles.textContainer}>
                         <View style={styles.trip}>
@@ -175,13 +174,11 @@ export default function TripHistory() {
                             color="#555"
                             style={{ marginHorizontal: 6 }}
                           />
-                          <Text style={styles.title}>
-                            {trip.destination}
-                          </Text>
+                          <Text style={styles.title}>{trip.destination}</Text>
                         </View>
 
-                        <Text style={styles.subtitle}> Departed at: {""}
-                          {formatTime(trip.departed_at)}
+                        <Text style={styles.subtitle}>
+                          Departed at: {formatTime(trip.departed_at)}
                         </Text>
                       </View>
                     </View>
@@ -210,14 +207,17 @@ const styles = StyleSheet.create({
   },
   textContainer: {
     flexDirection: "column",
+    flex: 1,
   },
   trip: {
     flexDirection: "row",
     alignItems: "center",
+    flexWrap: "wrap",
   },
   title: {
     fontSize: 18,
     fontWeight: "bold",
+    flexShrink: 1,
   },
   subtitle: {
     fontSize: 14,

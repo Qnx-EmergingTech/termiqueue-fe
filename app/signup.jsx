@@ -1,6 +1,6 @@
 import Checkbox from 'expo-checkbox';
 import { Link, Stack, useRouter } from "expo-router";
-import { createUserWithEmailAndPassword, getIdToken } from "firebase/auth";
+import { getIdToken, signInWithEmailAndPassword } from "firebase/auth";
 import { useState } from "react";
 import { Alert, Image, Pressable, Text, TextInput, View } from "react-native";
 import { auth } from "../firebaseConfig";
@@ -9,6 +9,7 @@ import { setToken } from "../src/utils/authStorage";
 
 export default function Index() {
   const router = useRouter();
+  const apiUrl = process.env.EXPO_PUBLIC_API_BASE_URL;
   const [appIsReady, setAppIsReady] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -38,31 +39,29 @@ export default function Index() {
     }
 
     try {
-      const userCred = await createUserWithEmailAndPassword(auth, email, password);
-      const user = userCred.user;
+      const user = await fetch(`${apiUrl}/profiles/register`, {
+        method: "POST",
+        body: JSON.stringify({ email, password }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+   
+      if (!user.ok) {
+        const err = await user.json();
+        throw new Error(err.detail || "Failed to create account");
+      }
 
-      const idToken = await getIdToken(user, true);
+      const data = await user.json();
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const idToken = await getIdToken(userCredential.user, true);
       await setToken(idToken);
       
-      console.log("User created:", user.email);
+      console.log("User created:", userCredential.user.email);
       Alert.alert("Success", "Your account has been created!");
       router.replace("/kyc");
     } catch (err) {
-      let msg;
-    switch (err.code) {
-      case "auth/email-already-in-use":
-        msg = "This email is already registered. Try logging in instead.";
-        break;
-      case "auth/invalid-email":
-        msg = "Please enter a valid email address.";
-        break;
-      case "auth/weak-password":
-        msg = "Password must be at least 6 characters.";
-        break;
-      default:
-        msg = "Something went wrong. Please try again.";
-    }
-    setError(msg);
+    setError(err.message || "An error occurred during registration.");
     }
   };
 

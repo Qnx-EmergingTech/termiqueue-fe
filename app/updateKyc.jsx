@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { Link, Stack, useRouter } from "expo-router";
+import { Stack, useRouter } from "expo-router";
 import { useState } from "react";
 import {
   Alert,
@@ -20,7 +20,7 @@ import { auth } from "../firebaseConfig";
 import styles from "../src/styles/styles";
 import { getToken } from "../src/utils/authStorage";
 
-export default function Kyc() {
+export default function UpdateKyc() {
   const router = useRouter();
 
   const [firstname, setFirstName] = useState("");
@@ -104,7 +104,7 @@ export default function Kyc() {
                   resizeMode="stretch"
                 />
                 <View style={styles.create}>
-                  <Text style={styles.heading}>Create your account</Text>
+                  <Text style={styles.heading}>Complete Your Profile</Text>
                 </View>
               </View>
 
@@ -191,7 +191,7 @@ export default function Kyc() {
                 </View>
 
                 <Pressable style={styles.registerButton} onPress={handleProceed}>
-                  <Text style={styles.loginText}>REGISTER</Text>
+                  <Text style={styles.loginText}>UPDATE PROFILE</Text>
                 </Pressable>
               </View>
             </View>

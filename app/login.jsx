@@ -89,7 +89,27 @@ export default function Login() {
         console.log("Push registration failed", pushErr);
       }
 
-      router.replace("/home");
+      const profileRes = await fetch(`${apiUrl}/profiles/me`, {
+        headers: { Authorization: `Bearer ${idToken}` },
+      });
+
+      if (profileRes.status === 404 || profileRes.status === 500) {
+        router.replace("/updateKyc");
+        return;
+      }
+
+      if (!profileRes.ok) {
+        throw new Error("Failed to load profile.");
+      }
+
+      const profile = await profileRes.json();
+      const kycComplete = !!(profile.first_name && profile.last_name && profile.birthdate);
+
+      if (!kycComplete) {
+        router.replace("/updateKyc");
+      } else {
+        router.replace("/home");
+      }
     } catch (err) {
       console.log(err);
       const message = err.code
@@ -183,7 +203,7 @@ export default function Login() {
               </View>
 
               <View style={styles.bottom}>
-                <Text style={styles.bot}>ALREADY HAVE AN ACCOUNT? </Text>
+                <Text style={styles.bot}>DON`T HAVE AN ACCOUNT? </Text>
                 <Link href="/signup" style={[styles.bot, styles.italic]}>
                   SIGN UP
                 </Link>

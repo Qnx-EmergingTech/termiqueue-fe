@@ -8,22 +8,51 @@ export default function Index() {
   const router = useRouter();
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
+  const apiUrl = process.env.EXPO_PUBLIC_API_BASE_URL;
+
   useEffect(() => {
     const checkAuth = async () => {
       try {
         console.log('🔍 Checking authentication...');
         const isLoggedIn = await AsyncStorage.getItem("isLoggedIn");
-        
+
         if (isLoggedIn === "true") {
-          console.log('✅ User authenticated, redirecting to home');
-          router.replace('/home');
+          console.log('✅ User authenticated, checking profile...');
+
+          const idToken = await AsyncStorage.getItem("firebaseIdToken");
+
+          const profileRes = await fetch(`${apiUrl}/profiles/me`, {
+            headers: { Authorization: `Bearer ${idToken}` },
+          });
+
+          if (profileRes.status === 404) {
+            await AsyncStorage.multiRemove(["firebaseIdToken", "userId", "isLoggedIn"]);
+            router.replace('/login');
+            return;
+          }
+
+          if (profileRes.status === 500) {
+            await AsyncStorage.multiRemove(["firebaseIdToken", "userId", "isLoggedIn"]);
+            router.replace('/login');
+            return;
+          }
+
+          if (!profileRes.ok) {
+            router.replace('/home');
+            return;
+          }
+
+          const profile = await profileRes.json();
+          const kycComplete = !!(profile.first_name && profile.last_name && profile.birthdate);
+
+          router.replace(kycComplete ? '/home' : '/updateKyc');
         } else {
           console.log('❌ User not authenticated, showing landing page');
           setIsCheckingAuth(false);
         }
       } catch (error) {
         console.error('Error checking auth:', error);
-        setIsCheckingAuth(false); 
+        setIsCheckingAuth(false);
       }
     };
 
@@ -33,12 +62,11 @@ export default function Index() {
   if (isCheckingAuth) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#fff' }}>
-        <ActivityIndicator size="large" color="#096B72" />
+        <ActivityIndicator size="large" color="#020eba" />
       </View>
     );
   }
 
-  // Show landing page if not authenticated
   const handleSignup = () => {
     router.push('/signup');
   };
